@@ -3,3 +3,9 @@
         color: #333;
         margin-bottom: 20px;
 }
+
+.app-container{
+        position: relative;
+        width: 100%;
+        overflow-x: hidden;
+}

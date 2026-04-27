@@ -1,0 +1,28 @@
+.navbar {
+        display: flex;
+        justify-content: space-between;
+        margin: 1em;
+        padding: 12px 20px;
+        align-items: center;
+        background-color: var(--dark);
+        border-radius: 2em;
+}
+
+.logo {
+        font-family: GeneralSans-Bold, sans-serif;
+        color: var(--light);
+        font-size: 1.5rem;
+}
+
+.links {
+        display: flex;
+        align-items: center;
+}
+
+.links a {
+        font-family: GeneralSans-Bold, sans-serif;
+        margin-left: 15px;
+        text-decoration: none;
+        color: var(--light);
+}
+
