@@ -4,8 +4,9 @@
         margin: 1em;
         padding: 12px 20px;
         align-items: center;
-        background-color: var(--dark);
+        background-color: var(--medium);
         border-radius: 2em;
+        box-shadow: 5px 10px 15px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
