@@ -33,3 +33,38 @@ BEGIN
     FROM Listing_Questions q
     WHERE q.listingID = NEW.listingID;
 END//
+
+-- Get all applications for a student
+CREATE PROCEDURE GetStudentApplications(IN p_userID INT)
+BEGIN
+    SELECT 
+        a.applicationID,
+        s.firstName,
+        s.lastName,
+        l.description AS listingDescription,
+        a.status,
+        a.createTime,
+        a.submitTime
+    FROM Application a
+    JOIN Student s ON a.userID = s.userID
+    JOIN Listing l ON a.listingID = l.listingID
+    WHERE a.userID = p_userID;
+END//
+
+-- Count applications by status
+CREATE FUNCTION CountApplicationsByStatus(p_status VARCHAR(50))
+RETURNS INT
+DETERMINISTIC
+READS SQL DATA
+BEGIN
+    DECLARE total INT;
+
+    SELECT COUNT(*)
+    INTO total
+    FROM Application
+    WHERE status = p_status;
+
+    RETURN total;
+END//
+
+DELIMITER ;
