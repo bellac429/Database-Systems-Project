@@ -2,9 +2,12 @@ import './Profile.css'
 
 function Profile() {
         return(
-                <>
-                        <h1>Profile</h1>
-                </>
+                <div className='profile-container'>
+                        <div className='profile'>
+
+
+                        </div>
+                </div>
         )
 }
 
