@@ -22,6 +22,141 @@ app.get("/api/health", async (_req, res) => {
   }
 });
 
+app.post("/api/auth/register", async (req, res) => {
+  const {
+    role,
+    email,
+    password,
+    address = null,
+    phone = null,
+    firstName = null,
+    lastName = null,
+    year = null,
+    dob = null,
+    gpa = null,
+    major = null,
+    companyName = null,
+  } = req.body;
+
+  if (!role || !email || !password) {
+    return res.status(400).json({ ok: false, error: "role, email, and password are required" });
+  }
+  if (role !== "student" && role !== "company") {
+    return res.status(400).json({ ok: false, error: "role must be student or company" });
+  }
+  if (role === "student" && (!firstName || !lastName)) {
+    return res.status(400).json({ ok: false, error: "firstName and lastName are required for students" });
+  }
+  if (role === "company" && !companyName) {
+    return res.status(400).json({ ok: false, error: "companyName is required for companies" });
+  }
+
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    const [existingUsers] = await conn.query("SELECT userID FROM Users WHERE email = ?", [email]);
+    if (existingUsers.length > 0) {
+      await conn.rollback();
+      return res.status(409).json({ ok: false, error: "Email already exists" });
+    }
+
+    const [userInsert] = await conn.query(
+      `
+      INSERT INTO Users (address, email, phone, password)
+      VALUES (?, ?, ?, ?)
+      `,
+      [address, email, phone, password]
+    );
+    const userId = userInsert.insertId;
+
+    if (role === "student") {
+      await conn.query(
+        `
+        INSERT INTO Student (userID, firstName, lastName, year, dob, gpa, major)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        `,
+        [userId, firstName, lastName, year, dob, gpa, major]
+      );
+    } else {
+      await conn.query(
+        `
+        INSERT INTO Company (userID, companyName)
+        VALUES (?, ?)
+        `,
+        [userId, companyName]
+      );
+    }
+
+    await conn.commit();
+    return res.status(201).json({
+      ok: true,
+      data: { userID: userId, role, email },
+    });
+  } catch (err) {
+    await conn.rollback();
+    return toApiError(res, err);
+  } finally {
+    conn.release();
+  }
+});
+
+app.post("/api/auth/login", async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ ok: false, error: "email and password are required" });
+  }
+
+  try {
+    const [users] = await pool.query(
+      `
+      SELECT userID, email
+      FROM Users
+      WHERE email = ? AND password = ?
+      LIMIT 1
+      `,
+      [email, password]
+    );
+
+    if (users.length === 0) {
+      return res.status(401).json({ ok: false, error: "Invalid email or password" });
+    }
+
+    const user = users[0];
+
+    const [studentRows] = await pool.query("SELECT firstName, lastName FROM Student WHERE userID = ?", [user.userID]);
+    if (studentRows.length > 0) {
+      return res.json({
+        ok: true,
+        data: {
+          userID: user.userID,
+          email: user.email,
+          role: "student",
+          firstName: studentRows[0].firstName,
+          lastName: studentRows[0].lastName,
+        },
+      });
+    }
+
+    const [companyRows] = await pool.query("SELECT companyName FROM Company WHERE userID = ?", [user.userID]);
+    if (companyRows.length > 0) {
+      return res.json({
+        ok: true,
+        data: {
+          userID: user.userID,
+          email: user.email,
+          role: "company",
+          companyName: companyRows[0].companyName,
+        },
+      });
+    }
+
+    return res.status(500).json({ ok: false, error: "User role record not found" });
+  } catch (err) {
+    return toApiError(res, err);
+  }
+});
+
 app.get("/api/listings", async (_req, res) => {
   try {
     const [rows] = await pool.query(`
