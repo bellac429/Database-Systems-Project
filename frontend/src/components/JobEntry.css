@@ -1,0 +1,78 @@
+.jobentry-container{
+        width: 100%;
+        height: fit-content;
+        background-color: var(--medium);
+        border-radius: 1em;
+        box-shadow: 5px 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+        .jobentry-company{
+                display: flex;
+                flex-direction: row;
+                height: fit-content;
+                align-items: center;
+        }
+
+                .jobentry-company-icon{
+                        height: 1em;
+                        aspect-ratio: 1/1;
+                        background-color: red;
+                        border-radius: 100%;
+                        margin: 1em;
+                }
+
+                .jobentry-company-name{
+                        display: flex;
+                        align-items: center;
+                        height: fit-content;
+                }
+
+                        .jobentry-company-name h1{
+                                padding: 1em;
+                                font-family: GeneralSans-Regular, sans-serif;
+                                color: var(--light);
+                                font-size: 1em;
+                        }
+
+        .jobentry-title{
+                padding: 1em;
+                margin: 0;
+                font-family: GeneralSans-Regular, sans-serif;
+                color: var(--light);
+                font-size: 1em;
+        }
+
+        .jobentry-info-container{
+                height: fit-content;
+                width: 100%;
+                background-color: var(--blue);
+        }
+
+                .jobentry-info-container p{
+                        padding: 1em;
+                        font-family: GeneralSans-Regular, sans-serif;
+                        color: var(--light);
+                        font-size: 0.9em;
+                        margin: 0;
+                }
+
+        .jobentry-apply{
+                display: flex;
+                justify-content: space-between;
+                padding: 1em;
+        }
+
+                .jobentry-apply h3{
+                        font-family: GeneralSans-Regular, sans-serif;
+                        text-decoration: none;
+                        color: var(--light);
+                }
+
+                .jobentry-apply button{
+                        font-family: GeneralSans-Bold, sans-serif;
+                        text-decoration: none;
+                        color: var(--light);
+                        background-color: red;
+                        padding: 0.5em 1em;
+                        border-radius: 0.5em;
+                }
