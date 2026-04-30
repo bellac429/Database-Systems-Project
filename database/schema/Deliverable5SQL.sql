@@ -75,3 +75,10 @@ WHERE a.submitTime < (
 SELECT *
 FROM view_submitted
 ORDER BY submitTime DESC;
+
+-- Use function
+SELECT CountApplicationsByStatus('submitted') AS submittedApplications;
+
+-- USE Procedure
+CALL GetStudentApplications(1);
+
