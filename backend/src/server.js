@@ -27,5 +27,5 @@ app.get("/api/listings", async (_req, res) => {
   res.json(rows);
 });
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;
 app.listen(port, () => console.log(`API running on http://localhost:${port}`));
