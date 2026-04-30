@@ -12,6 +12,7 @@ CREATE TABLE Users (
     address     VARCHAR(255),
     email       VARCHAR(255)    NOT NULL UNIQUE,
     phone       VARCHAR(20),
+    password    VARCHAR(255)    NOT NULL,
     PRIMARY KEY (userID)
 );
 
@@ -158,17 +159,17 @@ CREATE TABLE Student_Skills (
 -- ============================================================
 
 -- USERS
-INSERT INTO Users (address, email, phone) VALUES
-('123 Elm St, Iowa City, IA',       'alice@email.com',   '319-555-0101'),
-('456 Oak Ave, Iowa City, IA',      'bob@email.com',     '319-555-0102'),
-('789 Pine Rd, Coralville, IA',     'carol@email.com',   '319-555-0103'),
-('321 Maple Ln, North Liberty, IA', 'david@email.com',   '319-555-0104'),
-('654 Cedar Blvd, Iowa City, IA',   'emily@email.com',   '319-555-0105'),
-('100 Corporate Dr, Chicago, IL',   'recruit@techcorp.com', '312-555-0201'),
-('200 Business Park, Austin, TX',   'hr@innovate.com',      '512-555-0202'),
-('300 Startup Way, SF, CA',         'jobs@nextstep.com',    '415-555-0203'),
-('400 Enterprise Blvd, Seattle, WA','careers@cloud.com',    '206-555-0204'),
-('500 Commerce St, NY, NY',         'talent@apex.com',      '212-555-0205');
+INSERT INTO Users (address, email, phone, password) VALUES
+('123 Elm St, Iowa City, IA',       'alice@email.com',   '319-555-0101', 'alice123'),
+('456 Oak Ave, Iowa City, IA',      'bob@email.com',     '319-555-0102', 'bob123'),
+('789 Pine Rd, Coralville, IA',     'carol@email.com',   '319-555-0103', 'carol123'),
+('321 Maple Ln, North Liberty, IA', 'david@email.com',   '319-555-0104', 'david123'),
+('654 Cedar Blvd, Iowa City, IA',   'emily@email.com',   '319-555-0105', 'emily123'),
+('100 Corporate Dr, Chicago, IL',   'recruit@techcorp.com', '312-555-0201', 'techcorp123'),
+('200 Business Park, Austin, TX',   'hr@innovate.com',      '512-555-0202', 'innovate123'),
+('300 Startup Way, SF, CA',         'jobs@nextstep.com',    '415-555-0203', 'nextstep123'),
+('400 Enterprise Blvd, Seattle, WA','careers@cloud.com',    '206-555-0204', 'cloud123'),
+('500 Commerce St, NY, NY',         'talent@apex.com',      '212-555-0205', 'apex123');
 
 -- STUDENTS
 INSERT INTO Student VALUES
