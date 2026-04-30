@@ -12,7 +12,6 @@ CREATE TABLE Users (
     address     VARCHAR(255),
     email       VARCHAR(255)    NOT NULL UNIQUE,
     phone       VARCHAR(20),
-    password    VARCHAR(255)    NOT NULL,
     PRIMARY KEY (userID)
 );
 
@@ -64,6 +63,7 @@ CREATE TABLE Resume (
 -- ============================================================
 CREATE TABLE Listing (
     listingID       INT             NOT NULL AUTO_INCREMENT,
+    userID			INT 			NOT NULL,
     postDate        DATETIME        NOT NULL,
     dateDue         DATETIME        NOT NULL,
     description     VARCHAR(1000),
@@ -159,17 +159,17 @@ CREATE TABLE Student_Skills (
 -- ============================================================
 
 -- USERS
-INSERT INTO Users (address, email, phone, password) VALUES
-('123 Elm St, Iowa City, IA',       'alice@email.com',   '319-555-0101', 'alice123'),
-('456 Oak Ave, Iowa City, IA',      'bob@email.com',     '319-555-0102', 'bob123'),
-('789 Pine Rd, Coralville, IA',     'carol@email.com',   '319-555-0103', 'carol123'),
-('321 Maple Ln, North Liberty, IA', 'david@email.com',   '319-555-0104', 'david123'),
-('654 Cedar Blvd, Iowa City, IA',   'emily@email.com',   '319-555-0105', 'emily123'),
-('100 Corporate Dr, Chicago, IL',   'recruit@techcorp.com', '312-555-0201', 'techcorp123'),
-('200 Business Park, Austin, TX',   'hr@innovate.com',      '512-555-0202', 'innovate123'),
-('300 Startup Way, SF, CA',         'jobs@nextstep.com',    '415-555-0203', 'nextstep123'),
-('400 Enterprise Blvd, Seattle, WA','careers@cloud.com',    '206-555-0204', 'cloud123'),
-('500 Commerce St, NY, NY',         'talent@apex.com',      '212-555-0205', 'apex123');
+INSERT INTO Users (address, email, phone) VALUES
+('123 Elm St, Iowa City, IA',       'alice@email.com',   '319-555-0101'),
+('456 Oak Ave, Iowa City, IA',      'bob@email.com',     '319-555-0102'),
+('789 Pine Rd, Coralville, IA',     'carol@email.com',   '319-555-0103'),
+('321 Maple Ln, North Liberty, IA', 'david@email.com',   '319-555-0104'),
+('654 Cedar Blvd, Iowa City, IA',   'emily@email.com',   '319-555-0105'),
+('100 Corporate Dr, Chicago, IL',   'recruit@techcorp.com', '312-555-0201'),
+('200 Business Park, Austin, TX',   'hr@innovate.com',      '512-555-0202'),
+('300 Startup Way, SF, CA',         'jobs@nextstep.com',    '415-555-0203'),
+('400 Enterprise Blvd, Seattle, WA','careers@cloud.com',    '206-555-0204'),
+('500 Commerce St, NY, NY',         'talent@apex.com',      '212-555-0205');
 
 -- STUDENTS
 INSERT INTO Student VALUES
@@ -226,3 +226,176 @@ INSERT INTO Application_Answers (applicationID,questionID,answerText) VALUES
 -- SKILLS
 INSERT INTO Student_Skills VALUES
 (1,'Python'),(2,'Java'),(3,'ML'),(4,'SQL'),(5,'JS');
+
+-- =================================================
+-- VIEWS
+-- =================================================
+
+-- View only submitted applications
+CREATE VIEW view_submitted AS
+SELECT 
+    a.applicationID,
+    s.firstName,
+    s.lastName,
+    c.companyName,
+    l.description,
+    a.submitTime
+FROM Application a
+JOIN Student s ON a.userID = s.userID
+JOIN Listing l ON a.listingID = l.listingID
+JOIN Company_Listings cl ON l.listingID = cl.listingID
+JOIN Company c ON cl.userID = c.userID
+WHERE a.status = 'submitted';
+
+SELECT * FROM view_submitted;
+
+-- View only listings posted within the last 24h
+CREATE VIEW recent_listings AS
+SELECT * FROM listing
+WHERE DATE(PostDate) = CURDATE();
+
+SELECT * FROM recent_listings;
+
+
+-- =================================================
+-- QUERIES
+-- =================================================
+
+-- Query for seing student, status and listing they've applied to
+SELECT 
+    s.firstName,
+    s.lastName,
+    a.status,
+    l.description AS listingDescription
+FROM Application a
+JOIN Student s ON a.userID = s.userID
+JOIN Listing l ON a.listingID = l.listingID;
+
+-- # of applications per company
+SELECT 
+    c.companyName,
+    COUNT(a.applicationID) AS totalApplications
+FROM Company c
+JOIN Company_Listings cl ON c.userID = cl.userID
+JOIN Listing l ON cl.listingID = l.listingID
+LEFT JOIN Application a ON l.listingID = a.listingID
+GROUP BY c.companyName;
+
+-- Students with above avg GPA
+SELECT 
+    firstName,
+    lastName,
+    gpa,
+    major
+FROM Student
+WHERE gpa > (
+    SELECT AVG(gpa)
+    FROM Student
+);
+
+-- Applications submitted before deadline 
+SELECT 
+    s.firstName,
+    s.lastName,
+    l.description,
+    a.submitTime,
+    l.dateDue
+FROM Application a
+JOIN Student s ON a.userID = s.userID
+JOIN Listing l ON a.listingID = l.listingID
+WHERE a.submitTime < (
+    SELECT dateDue
+    FROM Listing
+    WHERE Listing.listingID = a.listingID
+);
+
+-- Submitted applications by most recent 
+SELECT *
+FROM view_submitted
+ORDER BY submitTime DESC;
+
+-- Use function
+SELECT CountApplicationsByStatus('submitted') AS submittedApplications;
+
+-- USE Procedure
+CALL GetStudentApplications(1);
+
+-- =================================================
+-- TRIGGERS
+-- =================================================
+
+-- Set submit time for newly submitted applications to the current time
+DELIMITER //
+CREATE TRIGGER set_submit_time
+BEFORE UPDATE ON Application
+FOR EACH ROW
+BEGIN
+    IF NEW.status = 'submitted' AND OLD.status <> 'submitted' THEN
+        SET NEW.submitTime = NOW();
+    END IF;
+END//
+
+-- Stop resume deletion if used in an application
+CREATE TRIGGER prevent_resume_delete
+BEFORE DELETE ON Resume
+FOR EACH ROW
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM Application
+        WHERE resumeID = OLD.resumeID
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot delete resume used in an application';
+    END IF;
+END//
+
+-- Create default empty answer for all aplication answers
+CREATE TRIGGER create_default_answers
+AFTER INSERT ON Application
+FOR EACH ROW
+BEGIN
+    INSERT INTO Application_Answers (applicationID, questionID)
+    SELECT NEW.applicationID, q.questionID
+    FROM Listing_Questions q
+    WHERE q.listingID = NEW.listingID;
+END//
+
+
+-- ======================================
+-- PROCEDURE & TASK
+-- ======================================
+
+-- Get all applications for a student
+CREATE PROCEDURE GetStudentApplications(IN p_userID INT)
+BEGIN
+    SELECT 
+        a.applicationID,
+        s.firstName,
+        s.lastName,
+        l.description AS listingDescription,
+        a.status,
+        a.createTime,
+        a.submitTime
+    FROM Application a
+    JOIN Student s ON a.userID = s.userID
+    JOIN Listing l ON a.listingID = l.listingID
+    WHERE a.userID = p_userID;
+END//
+
+-- Count applications by status
+CREATE FUNCTION CountApplicationsByStatus(p_status VARCHAR(50))
+RETURNS INT
+DETERMINISTIC
+READS SQL DATA
+BEGIN
+    DECLARE total INT;
+
+    SELECT COUNT(*)
+    INTO total
+    FROM Application
+    WHERE status = p_status;
+
+    RETURN total;
+END//
+
+DELIMITER ;
