@@ -76,95 +76,114 @@ function Profile() {
         }
 
         async function handleSave() {
-                if (user?.role === "company") {
-                        if (!formData.email || !formData.companyName) {
-                                alert("Email and company name are required");
-                                return;
-                        }
-
-                        try {
-                                const res = await fetch(
-                                        `http://localhost:5001/api/companies/${user.userID}/profile`,
-                                        {
-                                                method: "PATCH",
-                                                headers: {
-                                                        "Content-Type": "application/json"
-                                                },
-                                                body: JSON.stringify({
-                                                        email: formData.email,
-                                                        phone: formData.phone || null,
-                                                        address: formData.address || null,
-                                                        companyName: formData.companyName
-                                                })
-                                        }
-                                );
-
-                                const data = await res.json();
-
-                                if (data.ok) {
-                                        const updatedProfile = {
-                                                ...profile,
-                                                email: formData.email,
-                                                phone: formData.phone || null,
-                                                address: formData.address || null,
-                                                companyName: formData.companyName
-                                        };
-                                        setProfile(updatedProfile);
-                                        setFormData(updatedProfile);
-                                        setIsEditing(false);
-
-                                        const storedUser = JSON.parse(localStorage.getItem("user") || "null");
-                                        if (storedUser) {
-                                                localStorage.setItem(
-                                                        "user",
-                                                        JSON.stringify({
-                                                                ...storedUser,
-                                                                email: formData.email,
-                                                                companyName: formData.companyName
-                                                        })
-                                                );
-                                        }
-                                } else {
-                                        alert(data.error || "Failed to update profile");
-                                }
-                        } catch (err) {
-                                console.error(err);
-                        }
-                        return;
+                if (!user) return;
+              
+                if (user.role === "company") {
+                  if (!formData.email || !formData.companyName) {
+                    alert("Email and company name are required");
+                    return;
+                  }
+              
+                  try {
+                    const res = await fetch(
+                      `http://localhost:5001/api/companies/${user.userID}/profile`,
+                      {
+                        method: "PATCH",
+                        headers: {
+                          "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                          email: formData.email,
+                          phone: formData.phone || null,
+                          address: formData.address || null,
+                          companyName: formData.companyName
+                        })
+                      }
+                    );
+              
+                    const data = await res.json();
+              
+                    if (!data.ok) {
+                      alert(data.error || "Failed to update profile");
+                      return;
+                    }
+              
+                    const updatedProfile = {
+                      ...profile,
+                      email: formData.email,
+                      phone: formData.phone || null,
+                      address: formData.address || null,
+                      companyName: formData.companyName
+                    };
+              
+                    setProfile(updatedProfile);
+                    setFormData(updatedProfile);
+                    setIsEditing(false);
+              
+                  } catch (err) {
+                    console.error(err);
+                  }
+              
+                  return;
                 }
-
+              
                 if (formData.gpa < 0 || formData.gpa > 4) {
-                        alert("GPA must be between 0 and 4.0");
-                        return;
+                  alert("GPA must be between 0 and 4.0");
+                  return;
                 }
-                
+              
                 if (!formData.year || formData.year < 1) {
-                        alert("Year must be a valid number");
-                        return;
+                  alert("Year must be a valid number");
+                  return;
                 }
-
+              
                 try {
-                        const res = await fetch(
-                                `http://localhost:5001/api/students/${user.userID}/profile`,
-                                {
-                                method: "PATCH",
-                                headers: {
-                                "Content-Type": "application/json"
-                                },
-                                body: JSON.stringify(formData)
-                                }
-                        );
-                
-                        const data = await res.json();
-                
-                        if (data.ok) {
-                        setProfile(formData);
-                        setIsEditing(false);
-                        }
+                  const res = await fetch(
+                    `http://localhost:5001/api/students/${user.userID}/profile`,
+                    {
+                      method: "PATCH",
+                      headers: {
+                        "Content-Type": "application/json"
+                      },
+                      body: JSON.stringify({
+                        firstName: formData.firstName || null,
+                        lastName: formData.lastName || null,
+                        major: formData.major || null,
+                        year: formData.year || null,
+                        gpa: formData.gpa || null,
+                        dob: formData.dob ? formData.dob.split("T")[0] : null,
+                        skills: [] 
+                      })
+                    }
+                  );
+              
+                  const data = await res.json();
+              
+                  if (!data.ok) {
+                    alert(data.error || "Failed to update profile");
+                    return;
+                  }
+              
+                  // update UI
+                  const updatedProfile = {
+                    ...profile,
+                    firstName: formData.firstName,
+                    lastName: formData.lastName,
+                    major: formData.major,
+                    year: formData.year,
+                    gpa: formData.gpa,
+                    dob: formData.dob
+                  };
+              
+                  setProfile(updatedProfile);
+                  setFormData(updatedProfile);
+                  setIsEditing(false);
+              
                 } catch (err) {
-                        console.error(err);
+                  console.error(err);
                 }
-        }
+              }
+              
 
         async function handleResumeUpload() {
                 if (!resumeFile) {

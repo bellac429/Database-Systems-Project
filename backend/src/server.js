@@ -187,20 +187,28 @@ app.post("/api/auth/login", async (req, res) => {
 app.get("/api/listings", async (_req, res) => {
   try {
     const [rows] = await pool.query(`
-      SELECT l.listingID, l.postDate, l.dateDue, l.description, l.externalLink, c.companyName
+      SELECT 
+        l.listingID, 
+        l.postDate, 
+        l.dateDue, 
+        l.description, 
+        l.externalLink, 
+        c.companyName
       FROM Listing l
-      LEFT JOIN Company_Listings cl ON cl.listingID = l.listingID
-      LEFT JOIN Company c ON c.userID = cl.userID
+      LEFT JOIN Company c ON c.userID = l.userID
       ORDER BY l.postDate DESC
     `);
+
     res.json({ ok: true, data: rows });
   } catch (err) {
+    console.error(err);
     toApiError(res, err);
   }
 });
 
 app.get("/api/listings/:listingId", async (req, res) => {
   const listingId = Number(req.params.listingId);
+
   if (!Number.isInteger(listingId)) {
     return res.status(400).json({ ok: false, error: "Invalid listingId" });
   }
@@ -208,10 +216,16 @@ app.get("/api/listings/:listingId", async (req, res) => {
   try {
     const [listings] = await pool.query(
       `
-      SELECT l.listingID, l.postDate, l.dateDue, l.description, l.externalLink, c.companyName, c.userID AS companyUserID
+      SELECT 
+        l.listingID,
+        l.postDate,
+        l.dateDue,
+        l.description,
+        l.externalLink,
+        l.userID AS companyUserID,
+        c.companyName
       FROM Listing l
-      LEFT JOIN Company_Listings cl ON cl.listingID = l.listingID
-      LEFT JOIN Company c ON c.userID = cl.userID
+      LEFT JOIN Company c ON c.userID = l.userID
       WHERE l.listingID = ?
       `,
       [listingId]
@@ -231,11 +245,18 @@ app.get("/api/listings/:listingId", async (req, res) => {
       [listingId]
     );
 
-    return res.json({ ok: true, data: { ...listings[0], questions } });
+    return res.json({
+      ok: true,
+      data: {
+        ...listings[0],
+        questions
+      }
+    });
   } catch (err) {
     return toApiError(res, err);
   }
 });
+
 
 app.get("/api/students/:userId/profile", async (req, res) => {
   const userId = Number(req.params.userId);
@@ -353,22 +374,33 @@ app.get("/api/students/:userId/applications", async (req, res) => {
   try {
     const [rows] = await pool.query(
       `
-      SELECT a.applicationID, a.userID, a.listingID, a.resumeID, a.status, a.createTime, a.submitTime,
-             l.description AS listingDescription, l.dateDue, c.companyName
+      SELECT 
+        a.applicationID, 
+        a.userID, 
+        a.listingID, 
+        a.resumeID, 
+        a.status, 
+        a.createTime, 
+        a.submitTime,
+        l.description AS listingDescription, 
+        l.dateDue, 
+        c.companyName
       FROM Application a
       INNER JOIN Listing l ON l.listingID = a.listingID
-      LEFT JOIN Company_Listings cl ON cl.listingID = l.listingID
-      LEFT JOIN Company c ON c.userID = cl.userID
+      LEFT JOIN Company c ON c.userID = l.userID
       WHERE a.userID = ?
       ORDER BY a.createTime DESC
       `,
       [userId]
     );
+
     return res.json({ ok: true, data: rows });
   } catch (err) {
+    console.error(err); 
     return toApiError(res, err);
   }
 });
+
 
 app.get("/api/companies/:userId/listings", async (req, res) => {
   const userId = Number(req.params.userId);
@@ -706,6 +738,7 @@ app.patch("/api/students/:userId/profile", async (req, res) => {
     return res.json({ ok: true });
 
   } catch (err) {
+    console.error(err);
     await conn.rollback();
     return toApiError(res, err);
   } finally {
