@@ -1,6 +1,7 @@
 	-- ============================================================
 	-- SCHEMA SETUP
 	-- ============================================================
+	DROP SCHEMA IF EXISTS JobApplications;
 	CREATE SCHEMA JobApplications;
 	USE JobApplications;
 
@@ -196,13 +197,13 @@
 	(4,'david.pdf','2025-01-01'),
 	(5,'emily.pdf','2025-01-01');
 
-	-- LISTINGS
-	INSERT INTO Listing (postDate,dateDue,description,externalLink) VALUES
-	('2025-01-01','2025-03-01','SWE Intern','link1'),
-	('2025-01-02','2025-03-02','Data Analyst','link2'),
-	('2025-01-03','2025-03-03','Full Stack','link3'),
-	('2025-01-04','2025-03-04','Cloud Intern','link4'),
-	('2025-01-05','2025-03-05','Business Analyst','link5');
+-- LISTINGS
+INSERT INTO Listing (userID,postDate,dateDue,description,externalLink) VALUES
+(6,'2025-01-01','2025-03-01','SWE Intern','link1'),
+(7,'2025-01-02','2025-03-02','Data Analyst','link2'),
+(8,'2025-01-03','2025-03-03','Full Stack','link3'),
+(9,'2025-01-04','2025-03-04','Cloud Intern','link4'),
+(10,'2025-01-05','2025-03-05','Business Analyst','link5');
 
 	-- COMPANY LISTINGS
 	INSERT INTO Company_Listings VALUES

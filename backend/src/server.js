@@ -13,6 +13,19 @@ function toApiError(res, err) {
   return res.status(500).json({ ok: false, error: err.message });
 }
 
+function parseDateTimeInput(input) {
+  if (typeof input !== "string" || !input.trim()) {
+    return null;
+  }
+
+  const parsedDate = new Date(input);
+  if (Number.isNaN(parsedDate.getTime())) {
+    return null;
+  }
+
+  return parsedDate;
+}
+
 app.get("/api/health", async (_req, res) => {
   try {
     await pool.query("SELECT 1");
@@ -337,31 +350,76 @@ app.get("/api/companies/:userId/applications", async (req, res) => {
 });
 
 app.post("/api/listings", async (req, res) => {
-  const { companyUserId, dateDue, description, externalLink, questions = [] } = req.body;
-  if (!companyUserId || !dateDue) {
-    return res.status(400).json({ ok: false, error: "companyUserId and dateDue are required" });
+  const { companyUserId, companyEmail, dateDue, description, externalLink, questions = [] } = req.body;
+  if (!dateDue) {
+    return res.status(400).json({ ok: false, error: "dateDue is required" });
+  }
+  if (!companyUserId && !companyEmail) {
+    return res.status(400).json({ ok: false, error: "companyUserId or companyEmail is required" });
+  }
+  if (companyUserId && !Number.isInteger(Number(companyUserId))) {
+    return res.status(400).json({ ok: false, error: "companyUserId must be an integer" });
+  }
+  if (description && description.length > 1000) {
+    return res.status(400).json({ ok: false, error: "description must be 1000 characters or fewer" });
+  }
+  if (externalLink && externalLink.length > 100) {
+    return res.status(400).json({ ok: false, error: "externalLink must be 100 characters or fewer" });
+  }
+  if (!Array.isArray(questions)) {
+    return res.status(400).json({ ok: false, error: "questions must be an array" });
+  }
+
+  const parsedDateDue = parseDateTimeInput(dateDue);
+  if (!parsedDateDue) {
+    return res.status(400).json({ ok: false, error: "dateDue must be a valid date-time" });
+  }
+  const now = new Date();
+  if (parsedDateDue <= now) {
+    return res.status(400).json({ ok: false, error: "dateDue must be in the future" });
   }
 
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
 
+    let companyRows = [];
+    if (companyEmail) {
+      [companyRows] = await conn.query(
+        `
+        SELECT c.userID
+        FROM Company c
+        INNER JOIN Users u ON u.userID = c.userID
+        WHERE u.email = ?
+        LIMIT 1
+        `,
+        [companyEmail]
+      );
+    } else {
+      [companyRows] = await conn.query(
+        `
+        SELECT userID
+        FROM Company
+        WHERE userID = ?
+        LIMIT 1
+        `,
+        [Number(companyUserId)]
+      );
+    }
+    if (companyRows.length === 0) {
+      await conn.rollback();
+      return res.status(403).json({ ok: false, error: "Only company users can create listings" });
+    }
+    const resolvedCompanyUserId = Number(companyRows[0].userID);
+
     const [listingResult] = await conn.query(
       `
-      INSERT INTO Listing (postDate, dateDue, description, externalLink)
-      VALUES (NOW(), ?, ?, ?)
+      INSERT INTO Listing (userID, postDate, dateDue, description, externalLink)
+      VALUES (?, NOW(), ?, ?, ?)
       `,
-      [dateDue, description ?? null, externalLink ?? null]
+      [resolvedCompanyUserId, parsedDateDue, description ?? null, externalLink ?? null]
     );
     const listingId = listingResult.insertId;
-
-    await conn.query(
-      `
-      INSERT INTO Company_Listings (userID, listingID)
-      VALUES (?, ?)
-      `,
-      [companyUserId, listingId]
-    );
 
     for (const questionText of questions) {
       if (typeof questionText === "string" && questionText.trim().length > 0) {
