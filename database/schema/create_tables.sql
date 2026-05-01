@@ -71,22 +71,10 @@
 		description     VARCHAR(1000),
 		externalLink    VARCHAR(100),
 		PRIMARY KEY (listingID),
-		CHECK (postDate <= dateDue)
-	);
-
-	-- ============================================================
-	-- COMPANY_LISTINGS
-	-- ============================================================
-	CREATE TABLE Company_Listings (
-		userID      INT NOT NULL,
-		listingID   INT NOT NULL,
-		PRIMARY KEY (userID, listingID),
-		FOREIGN KEY (userID) REFERENCES Company(userID)
+		CHECK (postDate <= dateDue),
+        FOREIGN KEY (userID) REFERENCES Users(userID)
 			ON DELETE CASCADE
-			ON UPDATE CASCADE,
-		FOREIGN KEY (listingID) REFERENCES Listing(listingID)
-			ON DELETE CASCADE
-			ON UPDATE CASCADE
+            ON UPDATE CASCADE
 	);
 
 	-- ============================================================
@@ -197,18 +185,14 @@
 	(4,'david.pdf','2025-01-01'),
 	(5,'emily.pdf','2025-01-01');
 
--- LISTINGS
-INSERT INTO Listing (userID,postDate,dateDue,description,externalLink) VALUES
-(6,'2025-01-01','2025-03-01','SWE Intern','link1'),
-(7,'2025-01-02','2025-03-02','Data Analyst','link2'),
-(8,'2025-01-03','2025-03-03','Full Stack','link3'),
-(9,'2025-01-04','2025-03-04','Cloud Intern','link4'),
-(10,'2025-01-05','2025-03-05','Business Analyst','link5');
-
-	-- COMPANY LISTINGS
-	INSERT INTO Company_Listings VALUES
-	(6,1),(7,2),(8,3),(9,4),(10,5);
-
+	-- LISTINGS
+	INSERT INTO Listing (userID, postDate,dateDue,description,externalLink) VALUES
+	(6, '2025-01-01','2025-03-01','SWE Intern','link1'),
+	(6, '2025-01-02','2025-03-02','Data Analyst','link2'),
+	(7, '2025-01-03','2025-03-03','Full Stack','link3'),
+	(8, '2025-01-04','2025-03-04','Cloud Intern','link4'),
+	(9, '2025-01-05','2025-03-05','Business Analyst','link5');
+    
 	-- QUESTIONS
 	INSERT INTO Listing_Questions (listingID,questionText) VALUES
 	(1,'Q1'),(2,'Q2'),(3,'Q3'),(4,'Q4'),(5,'Q5');
@@ -235,19 +219,21 @@ INSERT INTO Listing (userID,postDate,dateDue,description,externalLink) VALUES
 
 	-- View only submitted applications
 	CREATE VIEW view_submitted AS
-	SELECT 
-		a.applicationID,
-		s.firstName,
-		s.lastName,
-		c.companyName,
-		l.description,
-		a.submitTime
-	FROM Application a
-	JOIN Student s ON a.userID = s.userID
-	JOIN Listing l ON a.listingID = l.listingID
-	JOIN Company_Listings cl ON l.listingID = cl.listingID
-	JOIN Company c ON cl.userID = c.userID
-	WHERE a.status = 'submitted';
+SELECT 
+    a.applicationID,
+    s.firstName,
+    s.lastName,
+    c.companyName,
+    l.description,
+    a.submitTime
+FROM Application a
+JOIN Student s 
+    ON a.userID = s.userID
+JOIN Listing l 
+    ON a.listingID = l.listingID
+JOIN Company c 
+    ON l.userID = c.userID
+WHERE a.status = 'submitted';
 
 	SELECT * FROM view_submitted;
 
@@ -274,14 +260,16 @@ INSERT INTO Listing (userID,postDate,dateDue,description,externalLink) VALUES
 	JOIN Listing l ON a.listingID = l.listingID;
 
 	-- # of applications per company
-	SELECT 
-		c.companyName,
-		COUNT(a.applicationID) AS totalApplications
-	FROM Company c
-	JOIN Company_Listings cl ON c.userID = cl.userID
-	JOIN Listing l ON cl.listingID = l.listingID
-	LEFT JOIN Application a ON l.listingID = a.listingID
-	GROUP BY c.companyName;
+-- # of applications per company
+SELECT 
+    c.companyName,
+    COUNT(a.applicationID) AS totalApplications
+FROM Company c
+JOIN Listing l 
+    ON c.userID = l.userID
+LEFT JOIN Application a 
+    ON l.listingID = a.listingID
+GROUP BY c.companyName;
 
 	-- Students with above avg GPA
 	SELECT 
