@@ -458,5 +458,56 @@ app.patch("/api/applications/:applicationId/status", async (req, res) => {
   }
 });
 
+app.patch("/api/students/:userId/profile", async (req, res) => {
+  const userId = Number(req.params.userId);
+
+  if (!Number.isInteger(userId)) {
+    return res.status(400).json({ ok: false, error: "Invalid userId" });
+  }
+
+  const { firstName, lastName, major, year, gpa, dob, skills = [] } = req.body;
+
+  const conn = await pool.getConnection();
+
+  try {
+    await conn.beginTransaction();
+
+    // Update Student table
+    await conn.query(
+      `
+      UPDATE Student
+      SET firstName = ?, lastName = ?, major = ?, year = ?, gpa = ?, dob = ?
+      WHERE userID = ?
+      `,
+      [firstName, lastName, major, year, gpa, dob, userId]
+    );
+
+    // Update skills (delete + reinsert)
+    await conn.query(
+      `DELETE FROM Student_Skills WHERE userID = ?`,
+      [userId]
+    );
+
+    for (const skill of skills) {
+      if (typeof skill === "string" && skill.trim()) {
+        await conn.query(
+          `INSERT INTO Student_Skills (userID, skill) VALUES (?, ?)`,
+          [userId, skill.trim()]
+        );
+      }
+    }
+
+    await conn.commit();
+
+    return res.json({ ok: true });
+
+  } catch (err) {
+    await conn.rollback();
+    return toApiError(res, err);
+  } finally {
+    conn.release();
+  }
+});
+
 const port = process.env.PORT || 5001;
 app.listen(port, () => console.log(`API running on http://localhost:${port}`));
