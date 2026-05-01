@@ -4,7 +4,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
-import JobListing from "./pages/JobListing";
+import Applications from "./pages/Applications";
 import './App.css'
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
       <Navbar />
       <Routes> 
         <Route path="/" element={<Home />} />
-        <Route path="/jobs/:id" element={<JobListing />} />
+        <Route path="/applications/:id" element={<Applications />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile/:id" element={<Profile />} />

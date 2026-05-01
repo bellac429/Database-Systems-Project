@@ -32,3 +32,10 @@
         color: var(--light);
 }
 
+.navbar button{
+        font-family: GeneralSans-Bold, sans-serif;
+        margin-left: 15px;
+        text-decoration: none;
+        background-color: var(--green);
+}
+
