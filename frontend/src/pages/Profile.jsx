@@ -32,7 +32,7 @@ function Profile() {
 
         if (loading) return <p>Loading...</p>;
 
-        console.log(profile);
+        console.log(user);
 
         return(
                 <div className='profile-container'>

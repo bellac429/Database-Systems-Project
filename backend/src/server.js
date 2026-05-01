@@ -222,7 +222,7 @@ app.get("/api/students/:userId/profile", async (req, res) => {
       SELECT u.userID, u.address, u.email, u.phone, s.firstName, s.lastName, s.year, s.dob, s.gpa, s.major, ss.skill
       FROM Users u
       INNER JOIN Student s ON s.userID = u.userID
-      INNER JOIN Student_Skills ss on ss.userID = u.userID
+      LEFT JOIN Student_Skills ss on ss.userID = u.userID
       WHERE u.userID = ?
       `,
       [userId]
