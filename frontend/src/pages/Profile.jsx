@@ -7,6 +7,8 @@ function Profile() {
         const [loading, setLoading] = useState(true); 
         const [isEditing, setIsEditing] = useState(false);
         const [formData, setFormData] = useState({});
+        const [resume, setResume] = useState(null);
+        const [resumeFile, setResumeFile] = useState(null);
         //get user info
         useEffect(() => {
                 const storedUser = JSON.parse(localStorage.getItem("user") || "null");
@@ -31,6 +33,19 @@ function Profile() {
                   })
                   .catch(err => console.error(err))
                   .finally(() => setLoading(false));
+        }, [user]);
+
+        //get user resume
+        useEffect(() => {
+                if (!user) return;
+              
+                fetch(`http://localhost:5001/api/students/${user.userID}/resume`)
+                  .then(res => res.json())
+                  .then(data => {
+                    if (data.ok) {
+                      setResume(data.data);
+                    }
+                  });
         }, [user]);
 
         console.log(formData);
@@ -88,6 +103,36 @@ function Profile() {
                         }
                 } catch (err) {
                         console.error(err);
+                }
+        }
+
+        async function handleResumeUpload() {
+                if (!resumeFile) {
+                  alert("Select a PDF first");
+                  return;
+                }
+              
+                const formData = new FormData();
+                formData.append("resume", resumeFile);
+                formData.append("userId", user.userID);
+              
+                try {
+                  const res = await fetch("http://localhost:5001/api/upload-resume", {
+                    method: "POST",
+                    body: formData
+                  });
+              
+                  const data = await res.json();
+              
+                  if (data.ok) {
+                    alert("Uploaded!");
+              
+                    // refresh resume
+                    setResume(data.data);
+                  }
+              
+                } catch (err) {
+                  console.error(err);
                 }
         }
 
@@ -169,6 +214,30 @@ function Profile() {
                                         <button onClick={() => setIsEditing(true)}>Edit Profile</button>
                                         </>
                                 )}
+                        </div>
+                        <div className="resume-section">
+                                <h3>Resume</h3>
+
+                                {resume ? (
+                                        <a
+                                        href={`http://localhost:5001/uploads/${resume.fileName}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        >
+                                        View Current Resume
+                                        </a>
+                                ) : (
+                                        <p>No resume uploaded</p>
+                                )}
+                                <input
+                                type="file"
+                                accept="application/pdf"
+                                onChange={(e) => setResumeFile(e.target.files[0])}
+                                />
+
+                                <button onClick={handleResumeUpload}>
+                                Upload Resume
+                                </button>
                         </div>
                 </div>
         )
