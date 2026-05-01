@@ -353,10 +353,10 @@ app.get("/api/companies/:userId/listings", async (req, res) => {
   try {
     const [rows] = await pool.query(
       `
-      SELECT l.listingID, l.postDate, l.dateDue, l.description, l.externalLink
-      FROM Company_Listings cl
-      INNER JOIN Listing l ON l.listingID = cl.listingID
-      WHERE cl.userID = ?
+      SELECT l.listingID, l.userID, l.postDate, l.dateDue, l.description, l.externalLink, c.companyName
+      FROM Listing l
+      LEFT JOIN Company c ON c.userID = l.userID
+      WHERE l.userID = ?
       ORDER BY l.postDate DESC
       `,
       [userId]
