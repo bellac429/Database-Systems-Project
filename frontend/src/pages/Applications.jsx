@@ -45,6 +45,7 @@ function Register() {
                                 description={application.listingDescription}
                                 dueDate={application.dateDue}
                                 status={application.status}
+                                listingID={application.listingID}
                                 />
                         ))}
                 </div>

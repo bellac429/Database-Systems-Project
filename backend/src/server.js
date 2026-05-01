@@ -2,12 +2,26 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { pool } from "./db.js";
+import multer from "multer";
 
 dotenv.config();
 const app = express();
 
 app.use(cors({ origin: "http://localhost:5173" }));
 app.use(express.json());
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname);
+  }
+});
+
+const upload = multer({ storage });
+app.use("/uploads", express.static("uploads"));
+
 
 function toApiError(res, err) {
   return res.status(500).json({ ok: false, error: err.message });
@@ -262,6 +276,35 @@ app.get("/api/students/:userId/resume", async (req, res) => {
   }
 });
 
+app.post("/api/upload-resume", upload.single("resume"), async (req, res) => {
+  const userId = Number(req.body.userId);
+
+  if (!req.file) {
+    return res.status(400).json({ ok: false, error: "No file uploaded" });
+  }
+
+  try {
+    const [result] = await pool.query(
+      `
+      INSERT INTO Resume (userID, fileName, dateUploaded)
+      VALUES (?, ?, NOW())
+      `,
+      [userId, req.file.filename]
+    );
+
+    return res.json({
+      ok: true,
+      data: {
+        resumeID: result.insertId,
+        fileName: req.file.filename
+      }
+    });
+
+  } catch (err) {
+    return toApiError(res, err);
+  }
+});
+
 app.get("/api/students/:userId/applications", async (req, res) => {
   const userId = Number(req.params.userId);
   if (!Number.isInteger(userId)) {
@@ -511,3 +554,100 @@ app.patch("/api/students/:userId/profile", async (req, res) => {
 
 const port = process.env.PORT || 5001;
 app.listen(port, () => console.log(`API running on http://localhost:${port}`));
+
+app.get("/api/applications/draft", async (req, res) => {
+  const { userId, listingId } = req.query;
+
+  if (!userId || !listingId) {
+    return res.status(400).json({ ok: false, error: "Missing params" });
+  }
+
+  try {
+    const [apps] = await pool.query(
+      `
+      SELECT *
+      FROM Application
+      WHERE userID = ? AND listingID = ? AND status = 'draft'
+      ORDER BY createTime DESC
+      LIMIT 1
+      `,
+      [userId, listingId]
+    );
+
+    if (apps.length === 0) {
+      return res.json({ ok: true, data: null });
+    }
+
+    const application = apps[0];
+
+    const [answers] = await pool.query(
+      `
+      SELECT questionID, answerText
+      FROM Application_Answers
+      WHERE applicationID = ?
+      `,
+      [application.applicationID]
+    );
+
+    return res.json({
+      ok: true,
+      data: {
+        application,
+        answers
+      }
+    });
+  } catch (err) {
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+app.patch("/api/applications/:applicationId", async (req, res) => {
+  const applicationId = Number(req.params.applicationId);
+
+  const { resumeId, status, answers = [] } = req.body;
+
+  if (!Number.isInteger(applicationId)) {
+    return res.status(400).json({ ok: false, error: "Invalid applicationId" });
+  }
+
+  const conn = await pool.getConnection();
+
+  try {
+    await conn.beginTransaction();
+
+    // update main application
+    await conn.query(
+      `
+      UPDATE Application
+      SET resumeID = ?, status = ?, submitTime = IF(? = 'submitted', NOW(), submitTime)
+      WHERE applicationID = ?
+      `,
+      [resumeId, status, status, applicationId]
+    );
+
+    // update answers (simple approach: delete + reinsert)
+    await conn.query(
+      `DELETE FROM Application_Answers WHERE applicationID = ?`,
+      [applicationId]
+    );
+
+    for (const a of answers) {
+      await conn.query(
+        `
+        INSERT INTO Application_Answers (applicationID, questionID, answerText)
+        VALUES (?, ?, ?)
+        `,
+        [applicationId, a.questionId, a.answerText]
+      );
+    }
+
+    await conn.commit();
+
+    return res.json({ ok: true });
+  } catch (err) {
+    await conn.rollback();
+    return res.status(500).json({ ok: false, error: err.message });
+  } finally {
+    conn.release();
+  }
+});

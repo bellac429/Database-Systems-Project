@@ -1,6 +1,7 @@
 import './ApplicationEntry.css'
+import { Link } from 'react-router-dom'
 
-function ApplicationEntry({companyName, description, dueDate, status}) {
+function ApplicationEntry({companyName, description, dueDate, status, listingID}) {
         return(
                 <div className='application-entry-container'>
                         <div className='application-entry-company'>
@@ -16,7 +17,11 @@ function ApplicationEntry({companyName, description, dueDate, status}) {
                         </div>
                         <div className='application-entry-status'>
                                 <h3>status: {status}</h3>
-                                {status === "draft" && <button>edit</button>}
+                                {status === "draft" && 
+                                        <Link to={`/apply/${listingID}`}>
+                                                <button>edit</button>
+                                        </Link>
+                                }
                         </div>
                 </div>
         )
