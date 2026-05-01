@@ -48,7 +48,7 @@ function Profile() {
                   });
         }, [user]);
 
-        console.log(formData);
+        console.log(profile);
 
         useEffect(() => {
                 if (profile) {

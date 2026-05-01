@@ -159,6 +159,7 @@ function JobApply() {
       }
 
       alert(status === "draft" ? "Draft saved!" : "Application submitted!")
+      window.location.href = `/applications/${applicationId}`;
 
     } catch (err) {
       console.error(err)
@@ -169,41 +170,43 @@ function JobApply() {
 
   return (
     <div className="job-apply-container">
-      <h1>{jobListing.description}</h1>
+        <div className='job-apply-card'>
+                <h1>{jobListing.description}</h1>
 
-      <h3>Resume</h3>
-      {resume ? (
-        <p>Using: {resume.fileName}</p>
-      ) : (
-        <p>No resume found</p>
-      )}
+                <h3>Resume</h3>
+                {resume ? (
+                        <p>Using: {resume.fileName}</p>
+                ) : (
+                        <p>No resume found</p>
+                )}
 
-      <h3>Additional Questions</h3>
+                <h3>Additional Questions</h3>
 
-      {jobListing.questions.map((q) => (
-        <div key={q.questionID}>
-          <p>{q.questionText}</p>
+                {jobListing.questions.map((q) => (
+                        <div key={q.questionID}>
+                        <p>{q.questionText}</p>
 
-          <input
-            type="text"
-            value={answers[q.questionID] || ""}
-            onChange={(e) =>
-              setAnswers(prev => ({
-                ...prev,
-                [q.questionID]: e.target.value
-              }))
-            }
-          />
-        </div>
-      ))}
+                        <input
+                        type="text"
+                        value={answers[q.questionID] || ""}
+                        onChange={(e) =>
+                        setAnswers(prev => ({
+                                ...prev,
+                                [q.questionID]: e.target.value
+                        }))
+                        }
+                        />
+                        </div>
+                ))}
 
-      <button onClick={() => handleSave("draft")}>
-        Save
-      </button>
+                <button onClick={() => handleSave("draft")}>
+                        Save
+                </button>
 
-      <button onClick={() => handleSave("submitted")}>
-        Submit Application
-      </button>
+                <button onClick={() => handleSave("submitted")}>
+                        Submit Application
+                </button>
+      </div>
     </div>
   )
 }

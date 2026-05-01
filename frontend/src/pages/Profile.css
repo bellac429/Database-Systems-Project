@@ -5,6 +5,7 @@
         display: flex;
         border-radius: 2em;
         flex-direction: column;
+        justify-content: center;
         align-items: center;
         background-color: var(--green);
 }
@@ -21,6 +22,11 @@
 .profile {
         display: flex;
         flex-direction: column;
+        background-color: var(--medium);
+        padding: 1em;
+        border-radius: 2em;
+        color: var(--light);
+        box-shadow: 5px 10px 15px rgba(0, 0, 0, 0.2);
 }
 
 .profile input {
@@ -35,4 +41,49 @@
 .profile p {
         font-family: GeneralSans-Regular, sans-serif;
         margin: 0.2em 0;
+}
+
+.profile button {
+        font-family: GeneralSans-Bold, sans-serif;
+        text-decoration: none;
+        color: var(--light);
+        background-color: red;
+        padding: 0.5em 1em;
+        border-radius: 1em;
+        margin-top: 1em;
+        margin-bottom: 1em;
+}
+
+.resume-section {
+        margin: 1em 1em 1em 1em;
+        border-radius: 2em;
+        justify-content: center;
+        align-items: center;
+        background-color: var(--medium);
+        padding: 1em;
+        color: var(--light);
+        box-shadow: 5px 10px 15px rgba(0, 0, 0, 0.2);
+}
+
+.resume-section h3 {
+        font-family: GeneralSans-Bold, sans-serif;
+        color: var(--light);
+        margin: 0.5em 0;
+}
+
+.resume-section a {
+        width: 100%;
+        font-family: GeneralSans-Regular, sans-serif;
+        text-decoration: none;
+        color: var(--light);
+}
+
+.resume-section button {
+        font-family: GeneralSans-Bold, sans-serif;
+        text-decoration: none;
+        color: var(--light);
+        background-color: red;
+        padding: 0.5em 1em;
+        border-radius: 1em;
+        margin-top: 0.5em;
 }
