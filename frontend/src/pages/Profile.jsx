@@ -76,6 +76,62 @@ function Profile() {
         }
 
         async function handleSave() {
+                if (user?.role === "company") {
+                        if (!formData.email || !formData.companyName) {
+                                alert("Email and company name are required");
+                                return;
+                        }
+
+                        try {
+                                const res = await fetch(
+                                        `http://localhost:5001/api/companies/${user.userID}/profile`,
+                                        {
+                                                method: "PATCH",
+                                                headers: {
+                                                        "Content-Type": "application/json"
+                                                },
+                                                body: JSON.stringify({
+                                                        email: formData.email,
+                                                        phone: formData.phone || null,
+                                                        address: formData.address || null,
+                                                        companyName: formData.companyName
+                                                })
+                                        }
+                                );
+
+                                const data = await res.json();
+
+                                if (data.ok) {
+                                        const updatedProfile = {
+                                                ...profile,
+                                                email: formData.email,
+                                                phone: formData.phone || null,
+                                                address: formData.address || null,
+                                                companyName: formData.companyName
+                                        };
+                                        setProfile(updatedProfile);
+                                        setFormData(updatedProfile);
+                                        setIsEditing(false);
+
+                                        const storedUser = JSON.parse(localStorage.getItem("user") || "null");
+                                        if (storedUser) {
+                                                localStorage.setItem(
+                                                        "user",
+                                                        JSON.stringify({
+                                                                ...storedUser,
+                                                                email: formData.email,
+                                                                companyName: formData.companyName
+                                                        })
+                                                );
+                                        }
+                                } else {
+                                        alert(data.error || "Failed to update profile");
+                                }
+                        } catch (err) {
+                                console.error(err);
+                        }
+                        return;
+                }
 
                 if (formData.gpa < 0 || formData.gpa > 4) {
                         alert("GPA must be between 0 and 4.0");
@@ -146,11 +202,53 @@ function Profile() {
                 return (
                         <div className='profile-container'>
                                 <div className='profile'>
-                                        <h1>{profile?.companyName || "Company Profile"}</h1>
-                                        <p><strong>User ID:</strong> {profile?.userID || "N/A"}</p>
-                                        <p><strong>Email:</strong> {profile?.email || "N/A"}</p>
-                                        <p><strong>Phone:</strong> {profile?.phone || "N/A"}</p>
-                                        <p><strong>Address:</strong> {profile?.address || "N/A"}</p>
+                                        {isEditing ? (
+                                                <>
+                                                <h1>Edit Company Profile</h1>
+                                                <p>Company Name</p>
+                                                <input
+                                                        name="companyName"
+                                                        value={formData.companyName || ""}
+                                                        onChange={handleChange}
+                                                />
+                                                <p>Email</p>
+                                                <input
+                                                        name="email"
+                                                        type="email"
+                                                        value={formData.email || ""}
+                                                        onChange={handleChange}
+                                                />
+                                                <p>Phone</p>
+                                                <input
+                                                        name="phone"
+                                                        value={formData.phone || ""}
+                                                        onChange={handleChange}
+                                                />
+                                                <p>Address</p>
+                                                <input
+                                                        name="address"
+                                                        value={formData.address || ""}
+                                                        onChange={handleChange}
+                                                />
+
+                                                <button onClick={handleSave}>Save</button>
+                                                <button onClick={() => {
+                                                        setFormData(profile);
+                                                        setIsEditing(false);
+                                                }}>
+                                                Cancel
+                                                </button>
+                                                </>
+                                        ) : (
+                                                <>
+                                                <h1>{profile?.companyName || "Company Profile"}</h1>
+                                                <p><strong>User ID:</strong> {profile?.userID || "N/A"}</p>
+                                                <p><strong>Email:</strong> {profile?.email || "N/A"}</p>
+                                                <p><strong>Phone:</strong> {profile?.phone || "N/A"}</p>
+                                                <p><strong>Address:</strong> {profile?.address || "N/A"}</p>
+                                                <button onClick={() => setIsEditing(true)}>Edit Profile</button>
+                                                </>
+                                        )}
                                 </div>
                         </div>
                 );

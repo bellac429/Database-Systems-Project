@@ -713,6 +713,91 @@ app.patch("/api/students/:userId/profile", async (req, res) => {
   }
 });
 
+app.patch("/api/companies/:userId/profile", async (req, res) => {
+  const userId = Number(req.params.userId);
+  if (!Number.isInteger(userId)) {
+    return res.status(400).json({ ok: false, error: "Invalid userId" });
+  }
+
+  const { email, phone = null, address = null, companyName } = req.body;
+  if (!email || !companyName) {
+    return res.status(400).json({ ok: false, error: "email and companyName are required" });
+  }
+
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    const [companyRows] = await conn.query(
+      `
+      SELECT userID
+      FROM Company
+      WHERE userID = ?
+      LIMIT 1
+      `,
+      [userId]
+    );
+    if (companyRows.length === 0) {
+      await conn.rollback();
+      return res.status(404).json({ ok: false, error: "Company not found" });
+    }
+
+    const [emailRows] = await conn.query(
+      `
+      SELECT userID
+      FROM Users
+      WHERE email = ? AND userID <> ?
+      LIMIT 1
+      `,
+      [email, userId]
+    );
+    if (emailRows.length > 0) {
+      await conn.rollback();
+      return res.status(409).json({ ok: false, error: "Email already exists" });
+    }
+
+    const [companyNameRows] = await conn.query(
+      `
+      SELECT userID
+      FROM Company
+      WHERE companyName = ? AND userID <> ?
+      LIMIT 1
+      `,
+      [companyName, userId]
+    );
+    if (companyNameRows.length > 0) {
+      await conn.rollback();
+      return res.status(409).json({ ok: false, error: "Company name already exists" });
+    }
+
+    await conn.query(
+      `
+      UPDATE Users
+      SET email = ?, phone = ?, address = ?
+      WHERE userID = ?
+      `,
+      [email, phone, address, userId]
+    );
+
+    await conn.query(
+      `
+      UPDATE Company
+      SET companyName = ?
+      WHERE userID = ?
+      `,
+      [companyName, userId]
+    );
+
+    await conn.commit();
+    return res.json({ ok: true });
+  } catch (err) {
+    await conn.rollback();
+    return toApiError(res, err);
+  } finally {
+    conn.release();
+  }
+});
+
 const port = process.env.PORT || 5001;
 app.listen(port, () => console.log(`API running on http://localhost:${port}`));
 
