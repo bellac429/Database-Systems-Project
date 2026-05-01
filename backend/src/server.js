@@ -486,6 +486,83 @@ app.post("/api/listings", async (req, res) => {
   }
 });
 
+app.patch("/api/listings/:listingId", async (req, res) => {
+  const listingId = Number(req.params.listingId);
+  const { companyUserId, companyEmail, dateDue, description = null, externalLink = null } = req.body;
+
+  if (!Number.isInteger(listingId)) {
+    return res.status(400).json({ ok: false, error: "Invalid listingId" });
+  }
+  if (!dateDue) {
+    return res.status(400).json({ ok: false, error: "dateDue is required" });
+  }
+  if (!companyUserId && !companyEmail) {
+    return res.status(400).json({ ok: false, error: "companyUserId or companyEmail is required" });
+  }
+  if (companyUserId && !Number.isInteger(Number(companyUserId))) {
+    return res.status(400).json({ ok: false, error: "companyUserId must be an integer" });
+  }
+  if (description && description.length > 1000) {
+    return res.status(400).json({ ok: false, error: "description must be 1000 characters or fewer" });
+  }
+  if (externalLink && externalLink.length > 100) {
+    return res.status(400).json({ ok: false, error: "externalLink must be 100 characters or fewer" });
+  }
+
+  const parsedDateDue = parseDateTimeInput(dateDue);
+  if (!parsedDateDue) {
+    return res.status(400).json({ ok: false, error: "dateDue must be a valid date-time" });
+  }
+
+  try {
+    let companyRows = [];
+    if (companyEmail) {
+      [companyRows] = await pool.query(
+        `
+        SELECT c.userID
+        FROM Company c
+        INNER JOIN Users u ON u.userID = c.userID
+        WHERE u.email = ?
+        LIMIT 1
+        `,
+        [companyEmail]
+      );
+    } else {
+      [companyRows] = await pool.query(
+        `
+        SELECT userID
+        FROM Company
+        WHERE userID = ?
+        LIMIT 1
+        `,
+        [Number(companyUserId)]
+      );
+    }
+
+    if (companyRows.length === 0) {
+      return res.status(403).json({ ok: false, error: "Only company users can edit listings" });
+    }
+    const resolvedCompanyUserId = Number(companyRows[0].userID);
+
+    const [result] = await pool.query(
+      `
+      UPDATE Listing
+      SET dateDue = ?, description = ?, externalLink = ?
+      WHERE listingID = ? AND userID = ?
+      `,
+      [parsedDateDue, description, externalLink, listingId, resolvedCompanyUserId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ ok: false, error: "Listing not found for this company" });
+    }
+
+    return res.json({ ok: true, message: "Listing updated" });
+  } catch (err) {
+    return toApiError(res, err);
+  }
+});
+
 app.post("/api/applications", async (req, res) => {
   const { userId, listingId, resumeId, status = "draft", submitTime = null, answers = [] } = req.body;
   if (!userId || !listingId || !resumeId) {
