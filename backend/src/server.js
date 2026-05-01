@@ -263,6 +263,32 @@ app.get("/api/students/:userId/profile", async (req, res) => {
   }
 });
 
+app.get("/api/companies/:userId/profile", async (req, res) => {
+  const userId = Number(req.params.userId);
+  if (!Number.isInteger(userId)) {
+    return res.status(400).json({ ok: false, error: "Invalid userId" });
+  }
+
+  try {
+    const [rows] = await pool.query(
+      `
+      SELECT u.userID, u.address, u.email, u.phone, c.companyName
+      FROM Users u
+      INNER JOIN Company c ON c.userID = u.userID
+      WHERE u.userID = ?
+      LIMIT 1
+      `,
+      [userId]
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ ok: false, error: "Company not found" });
+    }
+    return res.json({ ok: true, data: rows[0] });
+  } catch (err) {
+    return toApiError(res, err);
+  }
+});
+
 app.get("/api/students/:userId/resume", async (req, res) => {
   const userId = Number(req.params.userId);
   if (!Number.isInteger(userId)) {

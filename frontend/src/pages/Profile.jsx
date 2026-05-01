@@ -23,8 +23,12 @@ function Profile() {
                 }
 
                 setLoading(true);
+                const profileUrl =
+                  user.role === "company"
+                    ? `http://localhost:5001/api/companies/${user.userID}/profile`
+                    : `http://localhost:5001/api/students/${user.userID}/profile`;
 
-                fetch(`http://localhost:5001/api/students/${user.userID}/profile`)
+                fetch(profileUrl)
                   .then(res => res.json())
                   .then(data => {
                     if (data.ok) {
@@ -37,7 +41,7 @@ function Profile() {
 
         //get user resume
         useEffect(() => {
-                if (!user) return;
+                if (!user || user.role !== "student") return;
               
                 fetch(`http://localhost:5001/api/students/${user.userID}/resume`)
                   .then(res => res.json())
@@ -137,6 +141,20 @@ function Profile() {
         }
 
         if (loading) return <p>Loading...</p>;
+
+        if (user?.role === "company") {
+                return (
+                        <div className='profile-container'>
+                                <div className='profile'>
+                                        <h1>{profile?.companyName || "Company Profile"}</h1>
+                                        <p><strong>User ID:</strong> {profile?.userID || "N/A"}</p>
+                                        <p><strong>Email:</strong> {profile?.email || "N/A"}</p>
+                                        <p><strong>Phone:</strong> {profile?.phone || "N/A"}</p>
+                                        <p><strong>Address:</strong> {profile?.address || "N/A"}</p>
+                                </div>
+                        </div>
+                );
+        }
 
         return(
                 <div className='profile-container'>
