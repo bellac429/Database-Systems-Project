@@ -263,6 +263,32 @@ app.get("/api/students/:userId/profile", async (req, res) => {
   }
 });
 
+app.get("/api/companies/:userId/profile", async (req, res) => {
+  const userId = Number(req.params.userId);
+  if (!Number.isInteger(userId)) {
+    return res.status(400).json({ ok: false, error: "Invalid userId" });
+  }
+
+  try {
+    const [rows] = await pool.query(
+      `
+      SELECT u.userID, u.address, u.email, u.phone, c.companyName
+      FROM Users u
+      INNER JOIN Company c ON c.userID = u.userID
+      WHERE u.userID = ?
+      LIMIT 1
+      `,
+      [userId]
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ ok: false, error: "Company not found" });
+    }
+    return res.json({ ok: true, data: rows[0] });
+  } catch (err) {
+    return toApiError(res, err);
+  }
+});
+
 app.get("/api/students/:userId/resume", async (req, res) => {
   const userId = Number(req.params.userId);
   if (!Number.isInteger(userId)) {
@@ -353,10 +379,10 @@ app.get("/api/companies/:userId/listings", async (req, res) => {
   try {
     const [rows] = await pool.query(
       `
-      SELECT l.listingID, l.postDate, l.dateDue, l.description, l.externalLink
-      FROM Company_Listings cl
-      INNER JOIN Listing l ON l.listingID = cl.listingID
-      WHERE cl.userID = ?
+      SELECT l.listingID, l.userID, l.postDate, l.dateDue, l.description, l.externalLink, c.companyName
+      FROM Listing l
+      LEFT JOIN Company c ON c.userID = l.userID
+      WHERE l.userID = ?
       ORDER BY l.postDate DESC
       `,
       [userId]
@@ -486,6 +512,83 @@ app.post("/api/listings", async (req, res) => {
   }
 });
 
+app.patch("/api/listings/:listingId", async (req, res) => {
+  const listingId = Number(req.params.listingId);
+  const { companyUserId, companyEmail, dateDue, description = null, externalLink = null } = req.body;
+
+  if (!Number.isInteger(listingId)) {
+    return res.status(400).json({ ok: false, error: "Invalid listingId" });
+  }
+  if (!dateDue) {
+    return res.status(400).json({ ok: false, error: "dateDue is required" });
+  }
+  if (!companyUserId && !companyEmail) {
+    return res.status(400).json({ ok: false, error: "companyUserId or companyEmail is required" });
+  }
+  if (companyUserId && !Number.isInteger(Number(companyUserId))) {
+    return res.status(400).json({ ok: false, error: "companyUserId must be an integer" });
+  }
+  if (description && description.length > 1000) {
+    return res.status(400).json({ ok: false, error: "description must be 1000 characters or fewer" });
+  }
+  if (externalLink && externalLink.length > 100) {
+    return res.status(400).json({ ok: false, error: "externalLink must be 100 characters or fewer" });
+  }
+
+  const parsedDateDue = parseDateTimeInput(dateDue);
+  if (!parsedDateDue) {
+    return res.status(400).json({ ok: false, error: "dateDue must be a valid date-time" });
+  }
+
+  try {
+    let companyRows = [];
+    if (companyEmail) {
+      [companyRows] = await pool.query(
+        `
+        SELECT c.userID
+        FROM Company c
+        INNER JOIN Users u ON u.userID = c.userID
+        WHERE u.email = ?
+        LIMIT 1
+        `,
+        [companyEmail]
+      );
+    } else {
+      [companyRows] = await pool.query(
+        `
+        SELECT userID
+        FROM Company
+        WHERE userID = ?
+        LIMIT 1
+        `,
+        [Number(companyUserId)]
+      );
+    }
+
+    if (companyRows.length === 0) {
+      return res.status(403).json({ ok: false, error: "Only company users can edit listings" });
+    }
+    const resolvedCompanyUserId = Number(companyRows[0].userID);
+
+    const [result] = await pool.query(
+      `
+      UPDATE Listing
+      SET dateDue = ?, description = ?, externalLink = ?
+      WHERE listingID = ? AND userID = ?
+      `,
+      [parsedDateDue, description, externalLink, listingId, resolvedCompanyUserId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ ok: false, error: "Listing not found for this company" });
+    }
+
+    return res.json({ ok: true, message: "Listing updated" });
+  } catch (err) {
+    return toApiError(res, err);
+  }
+});
+
 app.post("/api/applications", async (req, res) => {
   const { userId, listingId, resumeId, status = "draft", submitTime = null, answers = [] } = req.body;
   if (!userId || !listingId || !resumeId) {
@@ -602,6 +705,91 @@ app.patch("/api/students/:userId/profile", async (req, res) => {
 
     return res.json({ ok: true });
 
+  } catch (err) {
+    await conn.rollback();
+    return toApiError(res, err);
+  } finally {
+    conn.release();
+  }
+});
+
+app.patch("/api/companies/:userId/profile", async (req, res) => {
+  const userId = Number(req.params.userId);
+  if (!Number.isInteger(userId)) {
+    return res.status(400).json({ ok: false, error: "Invalid userId" });
+  }
+
+  const { email, phone = null, address = null, companyName } = req.body;
+  if (!email || !companyName) {
+    return res.status(400).json({ ok: false, error: "email and companyName are required" });
+  }
+
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    const [companyRows] = await conn.query(
+      `
+      SELECT userID
+      FROM Company
+      WHERE userID = ?
+      LIMIT 1
+      `,
+      [userId]
+    );
+    if (companyRows.length === 0) {
+      await conn.rollback();
+      return res.status(404).json({ ok: false, error: "Company not found" });
+    }
+
+    const [emailRows] = await conn.query(
+      `
+      SELECT userID
+      FROM Users
+      WHERE email = ? AND userID <> ?
+      LIMIT 1
+      `,
+      [email, userId]
+    );
+    if (emailRows.length > 0) {
+      await conn.rollback();
+      return res.status(409).json({ ok: false, error: "Email already exists" });
+    }
+
+    const [companyNameRows] = await conn.query(
+      `
+      SELECT userID
+      FROM Company
+      WHERE companyName = ? AND userID <> ?
+      LIMIT 1
+      `,
+      [companyName, userId]
+    );
+    if (companyNameRows.length > 0) {
+      await conn.rollback();
+      return res.status(409).json({ ok: false, error: "Company name already exists" });
+    }
+
+    await conn.query(
+      `
+      UPDATE Users
+      SET email = ?, phone = ?, address = ?
+      WHERE userID = ?
+      `,
+      [email, phone, address, userId]
+    );
+
+    await conn.query(
+      `
+      UPDATE Company
+      SET companyName = ?
+      WHERE userID = ?
+      `,
+      [companyName, userId]
+    );
+
+    await conn.commit();
+    return res.json({ ok: true });
   } catch (err) {
     await conn.rollback();
     return toApiError(res, err);
