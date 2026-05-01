@@ -1,0 +1,79 @@
+.application-entry-container{
+width: 80%;
+height: fit-content;
+background-color: var(--medium);
+border-radius: 1em;
+box-shadow: 5px 10px 15px rgba(0, 0, 0, 0.2);
+margin-bottom: 1em;
+}
+
+.application-entry-company{
+display: flex;
+flex-direction: row;
+height: fit-content;
+align-items: center;
+}
+
+.application-entry-company-icon{
+height: 1em;
+aspect-ratio: 1/1;
+background-color: red;
+border-radius: 100%;
+margin: 1em;
+}
+
+.application-entry-company-name{
+display: flex;
+align-items: center;
+height: fit-content;
+}
+
+.application-entry-company-name h1{
+padding: 1em;
+font-family: GeneralSans-Regular, sans-serif;
+color: var(--light);
+font-size: 1em;
+}
+
+.application-entry-info-container{
+height: fit-content;
+width: 100%;
+background-color: var(--blue);
+}
+
+.application-entry-info-container p{
+        padding: 0em 1em 1em 1em;
+        font-family: GeneralSans-Regular, sans-serif;
+        color: var(--light);
+        font-size: 0.9em;
+        margin: 0;
+}
+
+.application-entry-title{
+        padding: 1em;
+        margin: 0;
+        font-family: GeneralSans-Regular, sans-serif;
+        color: var(--light);
+        font-size: 1em;
+}
+
+.application-entry-status{
+        display: flex;
+        justify-content: space-between;
+        padding: 1em;
+}
+
+        .application-entry-status h3{
+                font-family: GeneralSans-Regular, sans-serif;
+                text-decoration: none;
+                color: var(--light);
+        }
+
+        .application-entry-status button{
+                font-family: GeneralSans-Bold, sans-serif;
+                text-decoration: none;
+                color: var(--light);
+                background-color: red;
+                padding: 0.5em 1em;
+                border-radius: 0.5em;
+        }
