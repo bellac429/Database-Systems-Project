@@ -27,6 +27,7 @@ function Home() {
                         { listings.map(listing => (
                                 <JobEntry 
                                 key={listing.listingID} 
+                                listingID={listing.listingID}
                                 companyName={listing.companyName}
                                 description={listing.description}
                                 dateDue={listing.dateDue}

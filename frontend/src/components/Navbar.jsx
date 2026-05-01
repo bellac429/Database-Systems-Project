@@ -34,7 +34,16 @@ function Navbar() {
                             <>
                             <Link to="/">Home</Link>
                             <Link to="/applications/:id">Applications</Link>
-                            <Link to="/profile/:id">Profile</Link>
+                            <Link to={`/profile/${user.userID}`}>Profile</Link>
+                            <button onClick={handleLogout}>Log Out</button>
+                            </>
+                        )}
+
+                        {user && user.role === "company" && (
+                            <>
+                            <Link to="/createlisting/">New Listing</Link>
+                            <Link to="/listings/">Posted Listings</Link>
+                            <Link to={`/profile/${user.userID}`}>Profile</Link>
                             <button onClick={handleLogout}>Log Out</button>
                             </>
                         )}

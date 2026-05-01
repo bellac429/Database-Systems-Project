@@ -1,6 +1,7 @@
 import './JobEntry.css'
+import { Link } from 'react-router-dom'
 
-function JobEntry({companyName, postDate, description, externalLink, dateDue}) {
+function JobEntry({listingID, companyName, postDate, description, externalLink, dateDue}) {
         return(
                 <div className='jobentry-container'>
                         <div className='jobentry-company'>
@@ -18,7 +19,9 @@ function JobEntry({companyName, postDate, description, externalLink, dateDue}) {
                         </div>
                         <div className='jobentry-apply'>
                                 <h3>Apply by: {dateDue}</h3>
-                                <button>Apply</button>
+                                <Link to={`/apply/${listingID}`}>
+                                        <button>Apply</button>
+                                </Link>
                         </div>
                 </div>
         )

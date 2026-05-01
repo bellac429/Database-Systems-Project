@@ -40,6 +40,7 @@ function Register() {
                         { applications.map(application => (
                                 <ApplicationEntry 
                                 key={application.applicationID} 
+                                applicationID={application.applicationID}
                                 companyName={application.companyName}
                                 description={application.listingDescription}
                                 dueDate={application.dateDue}
