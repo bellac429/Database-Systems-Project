@@ -1,7 +1,9 @@
 import './ApplicationEntry.css'
 import { Link } from 'react-router-dom'
+import { formatFriendlyDateTime } from '../utils/formatDates'
 
 function ApplicationEntry({ companyName, description, dueDate, status, listingID, applicationID }) {
+        const dueLabel = formatFriendlyDateTime(dueDate)
         const applyPath =
                 status === "draft"
                         ? `/apply/${listingID}`
@@ -18,7 +20,7 @@ function ApplicationEntry({ companyName, description, dueDate, status, listingID
                         <div className='application-entry-info-container'>
                                 <h1 className='application-entry-title'>Description:</h1>
                                 <p>{description}</p>
-                                <p>due by: {dueDate}</p>
+                                <p className="application-entry-due">Due {dueLabel}</p>
                         </div>
                         <div className='application-entry-status'>
                                 <h3>status: {status}</h3>
