@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 40" role="img" aria-labelledby="logoTitle">
+  <title id="logoTitle">Job Finder</title>
+  <defs>
+    <linearGradient id="jfSymbolGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#aec3b0"/>
+      <stop offset="55%" stop-color="#598392"/>
+      <stop offset="100%" stop-color="#f4f7ef"/>
+    </linearGradient>
+    <linearGradient id="jfWordGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f4f7ef"/>
+      <stop offset="100%" stop-color="#e8efe4"/>
+    </linearGradient>
+  </defs>
+  <!-- Growth bars: career progression -->
+  <g transform="translate(2,7)" aria-hidden="true">
+    <rect x="0" y="18" width="10" height="12" rx="2.5" fill="url(#jfSymbolGrad)" opacity="0.92"/>
+    <rect x="13" y="10" width="10" height="20" rx="2.5" fill="#598392"/>
+    <rect x="26" y="0" width="10" height="30" rx="2.5" fill="#f4f7ef"/>
+    <circle cx="31" cy="6" r="2.5" fill="#aec3b0"/>
+  </g>
+  <text
+    x="48"
+    y="26.5"
+    fill="url(#jfWordGrad)"
+    font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+    font-size="17"
+    font-weight="700"
+    letter-spacing="-0.03em"
+  >Job Finder</text>
+</svg>

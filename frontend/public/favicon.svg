@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Job Finder">
+  <defs>
+    <linearGradient id="fabBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#124559"/>
+      <stop offset="100%" stop-color="#01161e"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="9" fill="url(#fabBg)"/>
+  <rect x="5" y="19" width="6" height="8" rx="1.5" fill="#aec3b0"/>
+  <rect x="13" y="13" width="6" height="14" rx="1.5" fill="#598392"/>
+  <rect x="21" y="5" width="6" height="22" rx="1.5" fill="#f4f7ef"/>
+  <circle cx="24" cy="9" r="2" fill="#aec3b0"/>
+</svg>

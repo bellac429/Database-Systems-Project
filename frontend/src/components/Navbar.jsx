@@ -20,7 +20,15 @@ function Navbar() {
     return (
         <nav className="navbar" aria-label="Main navigation">
                 <div className="navbar-inner">
-                <div className="logo">LOGO</div>
+                <Link to="/" className="logo">
+                  <img
+                    src="/logo.svg"
+                    alt="Job Finder"
+                    className="logo-img"
+                    width="168"
+                    height="34"
+                  />
+                </Link>
 
                 <div className="links">
                         {!user && (
