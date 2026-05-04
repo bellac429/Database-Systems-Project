@@ -1,16 +1,13 @@
 .job-apply-container {
-  width: min(calc(100vw - 2rem), 720px);
+  width: min(calc(100vw - 2 * var(--page-gutter)), 720px);
   min-height: calc(100vh - var(--page-pad-top) - 2rem);
   margin: var(--page-pad-top) auto 2rem;
-  padding: 2rem 1.25rem;
+  padding: 2rem var(--page-gutter);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: center;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(160deg, rgba(174, 195, 176, 0.5), rgba(89, 131, 146, 0.3));
-  box-shadow: var(--shadow-md);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  align-items: stretch;
+  background: transparent;
 }
 
 .job-apply-card {

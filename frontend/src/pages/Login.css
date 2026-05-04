@@ -1,16 +1,13 @@
 .login-container {
-  width: min(calc(100vw - 2rem), 520px);
+  width: min(calc(100vw - 2 * var(--page-gutter)), 520px);
   min-height: calc(100vh - var(--page-pad-top) - 2rem);
   margin: var(--page-pad-top) auto 2rem;
-  padding: 2rem 1.25rem;
+  padding: 2rem var(--page-gutter);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(160deg, rgba(174, 195, 176, 0.55), rgba(89, 131, 146, 0.35));
-  box-shadow: var(--shadow-md);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: transparent;
 }
 
 .login-console {
