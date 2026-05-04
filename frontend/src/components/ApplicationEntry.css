@@ -10,6 +10,12 @@
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+a.application-entry-container {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
 .application-entry-container:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
@@ -98,11 +104,7 @@
   color: rgba(244, 247, 239, 0.9);
 }
 
-.application-entry-status a {
-  text-decoration: none;
-}
-
-.application-entry-status button {
+.application-entry-cta {
   font-family: var(--font-display);
   color: var(--dark);
   background: var(--light);
@@ -112,10 +114,9 @@
   font-weight: 700;
   text-transform: capitalize;
   box-shadow: var(--shadow-sm);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  pointer-events: none;
 }
 
-.application-entry-status button:hover {
+.application-entry-container:hover .application-entry-cta {
   box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
 }

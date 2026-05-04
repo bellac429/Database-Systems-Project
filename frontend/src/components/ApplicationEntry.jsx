@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 function ApplicationEntry({companyName, description, dueDate, status, listingID}) {
         return(
-                <div className='application-entry-container'>
+                <Link className='application-entry-container' to={`/apply/${listingID}`}>
                         <div className='application-entry-company'>
                                 <div className='application-entry-company-icon'></div>
                                 <div className='application-entry-company-name'>
@@ -17,13 +17,11 @@ function ApplicationEntry({companyName, description, dueDate, status, listingID}
                         </div>
                         <div className='application-entry-status'>
                                 <h3>status: {status}</h3>
-                                {status === "draft" && 
-                                        <Link to={`/apply/${listingID}`}>
-                                                <button>edit</button>
-                                        </Link>
-                                }
+                                <span className='application-entry-cta'>
+                                        {status === "draft" ? "Continue" : "Open"}
+                                </span>
                         </div>
-                </div>
+                </Link>
         )
 }
 

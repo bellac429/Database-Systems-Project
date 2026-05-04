@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 function JobEntry({listingID, companyName, postDate, description, externalLink, dateDue}) {
         return(
-                <div className='jobentry-container'>
+                <Link className='jobentry-container' to={`/apply/${listingID}`}>
                         <div className='jobentry-company'>
                                 <div className='jobentry-company-icon'></div>
                                 <div className='jobentry-company-name'>
@@ -19,11 +19,9 @@ function JobEntry({listingID, companyName, postDate, description, externalLink, 
                         </div>
                         <div className='jobentry-apply'>
                                 <h3>Apply by: {dateDue}</h3>
-                                <Link to={`/apply/${listingID}`}>
-                                        <button>Apply</button>
-                                </Link>
+                                <span className='jobentry-apply-cta'>Apply</span>
                         </div>
-                </div>
+                </Link>
         )
 }
 

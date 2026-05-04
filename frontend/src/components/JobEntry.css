@@ -10,6 +10,12 @@
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+a.jobentry-container {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
 .jobentry-container:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
@@ -100,11 +106,7 @@
   color: rgba(244, 247, 239, 0.9);
 }
 
-.jobentry-apply a {
-  text-decoration: none;
-}
-
-.jobentry-apply button {
+.jobentry-apply-cta {
   font-family: var(--font-display);
   color: var(--dark);
   background: var(--light);
@@ -113,10 +115,9 @@
   font-size: 0.9rem;
   font-weight: 700;
   box-shadow: var(--shadow-sm);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  pointer-events: none;
 }
 
-.jobentry-apply button:hover {
+.jobentry-container:hover .jobentry-apply-cta {
   box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
 }
