@@ -1,41 +1,77 @@
 .navbar {
-        width: 90%;
-        height: 2.5em;
-        position: fixed;
-        top: 0;
-        z-index: 1000;
-        display: flex;
-        justify-content: space-between;
-        margin: 1em;
-        padding: 12px 20px;
-        align-items: center;
-        background-color: var(--medium);
-        border-radius: 2em;
-        box-shadow: 5px 10px 15px rgba(0, 0, 0, 0.3);
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: min(1120px, calc(100% - 2rem));
+  margin: 1rem auto 0;
+  padding: 0.65rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  background: linear-gradient(135deg, rgba(18, 69, 89, 0.97), rgba(1, 22, 30, 0.92));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(244, 247, 239, 0.12);
+  box-shadow: var(--shadow-md), 0 0 0 1px rgba(0, 0, 0, 0.04) inset;
 }
 
 .logo {
-        font-family: GeneralSans-Bold, sans-serif;
-        color: var(--light);
-        font-size: 1.5rem;
+  font-family: var(--font-display);
+  color: var(--light);
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+  opacity: 0.95;
 }
 
 .links {
-        display: flex;
-        align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem 0.5rem;
 }
 
 .links a {
-        font-family: GeneralSans-Bold, sans-serif;
-        margin-left: 15px;
-        text-decoration: none;
-        color: var(--light);
+  font-family: var(--font-display);
+  padding: 0.45rem 0.85rem;
+  text-decoration: none;
+  color: rgba(244, 247, 239, 0.92);
+  border-radius: var(--radius-pill);
+  font-size: 0.875rem;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
-.navbar button{
-        font-family: GeneralSans-Bold, sans-serif;
-        margin-left: 15px;
-        text-decoration: none;
-        background-color: var(--green);
+.links a:hover {
+  background: rgba(244, 247, 239, 0.12);
+  color: var(--light);
 }
 
+.navbar button {
+  font-family: var(--font-display);
+  margin-left: 0.25rem;
+  padding: 0.45rem 1rem;
+  text-decoration: none;
+  background: var(--light);
+  color: var(--dark);
+  border-radius: var(--radius-pill);
+  font-size: 0.875rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+
+.navbar button:hover {
+  background: #fff;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.navbar button:active {
+  transform: translateY(0);
+}

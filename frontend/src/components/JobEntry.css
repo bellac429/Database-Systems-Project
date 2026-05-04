@@ -1,87 +1,122 @@
-.jobentry-container{
-        width: 80%;
-        height: fit-content;
-        background-color: var(--medium);
-        border-radius: 1em;
-        box-shadow: 5px 10px 15px rgba(0, 0, 0, 0.2);
-        margin-bottom: 1em;
+.jobentry-container {
+  width: 100%;
+  height: fit-content;
+  background: linear-gradient(165deg, rgba(18, 69, 89, 0.97), rgba(1, 22, 30, 0.92));
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 0;
+  overflow: hidden;
+  border: 1px solid rgba(244, 247, 239, 0.1);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-        .jobentry-company{
-                display: flex;
-                flex-direction: row;
-                height: fit-content;
-                align-items: center;
-        }
+.jobentry-container:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
 
-                .jobentry-company-icon{
-                        height: 1em;
-                        aspect-ratio: 1/1;
-                        background-color: red;
-                        border-radius: 100%;
-                        margin: 1em;
-                }
+.jobentry-company {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid rgba(244, 247, 239, 0.08);
+}
 
-                .jobentry-company-name{
-                        display: flex;
-                        align-items: center;
-                        height: fit-content;
-                }
+.jobentry-company-icon {
+  height: 2.5rem;
+  width: 2.5rem;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, var(--green), var(--blue));
+  border-radius: 50%;
+  margin: 1rem;
+  box-shadow: 0 2px 8px rgba(1, 22, 30, 0.25);
+}
 
-                        .jobentry-company-name h1{
-                                padding: 1em;
-                                font-family: GeneralSans-Regular, sans-serif;
-                                color: var(--light);
-                                font-size: 1em;
-                        }
+.jobentry-company-name {
+  display: flex;
+  align-items: center;
+  min-height: fit-content;
+}
 
-        .jobentry-posttime{
-                font-family: GeneralSans-Light, sans-serif;
-                margin: 0 1em 1em 1em;
-                font-size: smaller;
-                color: var(--light);
-                /* padding: 0 1em 1em 1em; */
-        }
+.jobentry-company-name h1 {
+  padding: 0.75rem 1rem 0.75rem 0;
+  margin: 0;
+  font-family: var(--font-display);
+  color: var(--light);
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+}
 
-        .jobentry-title{
-                padding: 1em;
-                margin: 0;
-                font-family: GeneralSans-Regular, sans-serif;
-                color: var(--light);
-                font-size: 1em;
-        }
+.jobentry-posttime {
+  font-family: var(--font-muted);
+  margin: 0 1rem 0.75rem;
+  font-size: 0.8rem;
+  color: rgba(244, 247, 239, 0.55);
+  font-weight: 400;
+}
 
-        .jobentry-info-container{
-                height: fit-content;
-                width: 100%;
-                background-color: var(--blue);
-        }
+.jobentry-title {
+  padding: 0.85rem 1rem 0.35rem;
+  margin: 0;
+  font-family: var(--font-display);
+  color: rgba(244, 247, 239, 0.75);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
 
-                .jobentry-info-container p{
-                        padding: 0em 1em 1em 1em;
-                        font-family: GeneralSans-Regular, sans-serif;
-                        color: var(--light);
-                        font-size: 0.9em;
-                        margin: 0;
-                }
+.jobentry-info-container {
+  width: 100%;
+  background: rgba(89, 131, 146, 0.45);
+  border-top: 1px solid rgba(244, 247, 239, 0.06);
+}
 
-        .jobentry-apply{
-                display: flex;
-                justify-content: space-between;
-                padding: 1em;
-        }
+.jobentry-info-container p {
+  padding: 0 1rem 1rem;
+  font-family: var(--font-body);
+  color: var(--light);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+  word-break: break-word;
+}
 
-                .jobentry-apply h3{
-                        font-family: GeneralSans-Regular, sans-serif;
-                        text-decoration: none;
-                        color: var(--light);
-                }
+.jobentry-apply {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.15rem;
+  background: rgba(1, 22, 30, 0.25);
+}
 
-                .jobentry-apply button{
-                        font-family: GeneralSans-Bold, sans-serif;
-                        text-decoration: none;
-                        color: var(--light);
-                        background-color: red;
-                        padding: 0.5em 1em;
-                        border-radius: 0.5em;
-                }
+.jobentry-apply h3 {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin: 0;
+  color: rgba(244, 247, 239, 0.9);
+}
+
+.jobentry-apply a {
+  text-decoration: none;
+}
+
+.jobentry-apply button {
+  font-family: var(--font-display);
+  color: var(--dark);
+  background: var(--light);
+  padding: 0.55rem 1.25rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.9rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.jobentry-apply button:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}

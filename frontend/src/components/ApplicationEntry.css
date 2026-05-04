@@ -1,79 +1,121 @@
-.application-entry-container{
-width: 80%;
-height: fit-content;
-background-color: var(--medium);
-border-radius: 1em;
-box-shadow: 5px 10px 15px rgba(0, 0, 0, 0.2);
-margin-bottom: 1em;
+.application-entry-container {
+  width: 100%;
+  height: fit-content;
+  background: linear-gradient(165deg, rgba(18, 69, 89, 0.97), rgba(1, 22, 30, 0.92));
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 0;
+  overflow: hidden;
+  border: 1px solid rgba(244, 247, 239, 0.1);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.application-entry-company{
-display: flex;
-flex-direction: row;
-height: fit-content;
-align-items: center;
+.application-entry-container:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
 
-.application-entry-company-icon{
-height: 1em;
-aspect-ratio: 1/1;
-background-color: red;
-border-radius: 100%;
-margin: 1em;
+.application-entry-company {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-bottom: 1px solid rgba(244, 247, 239, 0.08);
 }
 
-.application-entry-company-name{
-display: flex;
-align-items: center;
-height: fit-content;
+.application-entry-company-icon {
+  height: 2.5rem;
+  width: 2.5rem;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, var(--blue), var(--medium));
+  border-radius: 50%;
+  margin: 1rem;
+  box-shadow: 0 2px 8px rgba(1, 22, 30, 0.25);
 }
 
-.application-entry-company-name h1{
-padding: 1em;
-font-family: GeneralSans-Regular, sans-serif;
-color: var(--light);
-font-size: 1em;
+.application-entry-company-name {
+  display: flex;
+  align-items: center;
+  min-height: fit-content;
 }
 
-.application-entry-info-container{
-height: fit-content;
-width: 100%;
-background-color: var(--blue);
+.application-entry-company-name h1 {
+  padding: 0.75rem 1rem 0.75rem 0;
+  margin: 0;
+  font-family: var(--font-display);
+  color: var(--light);
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
 }
 
-.application-entry-info-container p{
-        padding: 0em 1em 1em 1em;
-        font-family: GeneralSans-Regular, sans-serif;
-        color: var(--light);
-        font-size: 0.9em;
-        margin: 0;
+.application-entry-info-container {
+  width: 100%;
+  background: rgba(89, 131, 146, 0.45);
+  border-top: 1px solid rgba(244, 247, 239, 0.06);
 }
 
-.application-entry-title{
-        padding: 1em;
-        margin: 0;
-        font-family: GeneralSans-Regular, sans-serif;
-        color: var(--light);
-        font-size: 1em;
+.application-entry-info-container p {
+  padding: 0 1rem 0.85rem;
+  font-family: var(--font-body);
+  color: var(--light);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0;
+  word-break: break-word;
 }
 
-.application-entry-status{
-        display: flex;
-        justify-content: space-between;
-        padding: 1em;
+.application-entry-info-container p:last-child {
+  font-size: 0.85rem;
+  color: rgba(244, 247, 239, 0.65);
+  padding-bottom: 1rem;
 }
 
-        .application-entry-status h3{
-                font-family: GeneralSans-Regular, sans-serif;
-                text-decoration: none;
-                color: var(--light);
-        }
+.application-entry-title {
+  padding: 0.85rem 1rem 0.35rem;
+  margin: 0;
+  font-family: var(--font-display);
+  color: rgba(244, 247, 239, 0.75);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
 
-        .application-entry-status button{
-                font-family: GeneralSans-Bold, sans-serif;
-                text-decoration: none;
-                color: var(--light);
-                background-color: red;
-                padding: 0.5em 1em;
-                border-radius: 0.5em;
-        }
+.application-entry-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.15rem;
+  background: rgba(1, 22, 30, 0.25);
+}
+
+.application-entry-status h3 {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: capitalize;
+  margin: 0;
+  color: rgba(244, 247, 239, 0.9);
+}
+
+.application-entry-status a {
+  text-decoration: none;
+}
+
+.application-entry-status button {
+  font-family: var(--font-display);
+  color: var(--dark);
+  background: var(--light);
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.application-entry-status button:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}

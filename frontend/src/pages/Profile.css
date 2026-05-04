@@ -1,89 +1,194 @@
 .profile-container {
-        width: calc(100vw - 2em);
-        height: calc(100vh - 8em);
-        margin: 7em 1em 1em 1em;
-        display: flex;
-        border-radius: 2em;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        background-color: var(--green);
+  width: min(calc(100vw - 2rem), 960px);
+  min-height: calc(100vh - var(--page-pad-top) - 2rem);
+  margin: var(--page-pad-top) auto 2rem;
+  padding: 2rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.5rem;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(160deg, rgba(174, 195, 176, 0.5), rgba(89, 131, 146, 0.3));
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+@media (min-width: 800px) {
+  .profile-container {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .profile-container > .profile {
+    flex: 1 1 320px;
+    max-width: 480px;
+  }
+
+  .profile-container > .resume-section {
+    flex: 1 1 280px;
+    max-width: 400px;
+    margin: 0;
+  }
 }
 
 .profile-container h1 {
-        text-align: center;
-        font-family: GeneralSans-Bold, sans-serif;
+  text-align: center;
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+.profile-container > .profile > h1 {
+  margin-top: 0;
 }
 
 .profile-container p {
-        font-family: GeneralSans-Regular, sans-serif;
+  font-family: var(--font-body);
 }
 
 .profile {
-        display: flex;
-        flex-direction: column;
-        background-color: var(--medium);
-        padding: 1em;
-        border-radius: 2em;
-        color: var(--light);
-        box-shadow: 5px 10px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  background: linear-gradient(165deg, rgba(18, 69, 89, 0.98), rgba(1, 22, 30, 0.94));
+  padding: 1.75rem;
+  border-radius: var(--radius-lg);
+  color: var(--light);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(244, 247, 239, 0.1);
+}
+
+.profile > p:first-of-type {
+  margin-top: 0;
 }
 
 .profile input {
-        width: 20em;
-        height: 1em;
-        border-radius: 0.5em;
-        border: none;
-        margin: .2em 0;
-        padding: 0.5em;
+  width: 100%;
+  max-width: 100%;
+  min-height: 2.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(244, 247, 239, 0.15);
+  background: rgba(244, 247, 239, 0.08);
+  color: var(--light);
+  margin: 0.15rem 0 0.65rem;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.95rem;
+}
+
+.profile input:focus {
+  outline: none;
+  border-color: var(--green);
 }
 
 .profile p {
-        font-family: GeneralSans-Regular, sans-serif;
-        margin: 0.2em 0;
+  font-family: var(--font-body);
+  margin: 0.35rem 0 0;
+  font-size: 0.95rem;
+  color: rgba(244, 247, 239, 0.88);
+}
+
+.profile p strong {
+  color: var(--light);
+  font-family: var(--font-display);
+  font-weight: 700;
 }
 
 .profile button {
-        font-family: GeneralSans-Bold, sans-serif;
-        text-decoration: none;
-        color: var(--light);
-        background-color: red;
-        padding: 0.5em 1em;
-        border-radius: 1em;
-        margin-top: 1em;
-        margin-bottom: 1em;
+  font-family: var(--font-display);
+  color: var(--dark);
+  background: var(--light);
+  padding: 0.65rem 1.1rem;
+  border-radius: var(--radius-pill);
+  margin-top: 0.75rem;
+  margin-right: 0.5rem;
+  margin-bottom: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.profile button:last-of-type {
+  margin-right: 0;
+}
+
+.profile button:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.profile button + button {
+  background: transparent;
+  color: var(--light);
+  border: 1px solid rgba(244, 247, 239, 0.35);
+  box-shadow: none;
+}
+
+.profile button + button:hover {
+  background: rgba(244, 247, 239, 0.1);
+  transform: translateY(-1px);
 }
 
 .resume-section {
-        margin: 1em 1em 1em 1em;
-        border-radius: 2em;
-        justify-content: center;
-        align-items: center;
-        background-color: var(--medium);
-        padding: 1em;
-        color: var(--light);
-        box-shadow: 5px 10px 15px rgba(0, 0, 0, 0.2);
+  margin: 0;
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+  background: linear-gradient(165deg, rgba(18, 69, 89, 0.95), rgba(1, 22, 30, 0.9));
+  padding: 1.75rem;
+  color: var(--light);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(244, 247, 239, 0.1);
 }
 
 .resume-section h3 {
-        font-family: GeneralSans-Bold, sans-serif;
-        color: var(--light);
-        margin: 0.5em 0;
+  font-family: var(--font-display);
+  color: var(--light);
+  margin: 0;
+  font-size: 1.15rem;
 }
 
 .resume-section a {
-        width: 100%;
-        font-family: GeneralSans-Regular, sans-serif;
-        text-decoration: none;
-        color: var(--light);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-body);
+  text-decoration: none;
+  color: var(--light);
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(174, 195, 176, 0.5);
+  width: fit-content;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.resume-section a:hover {
+  color: var(--green);
+  border-color: var(--green);
+}
+
+.resume-section input[type="file"] {
+  font-size: 0.85rem;
+  color: rgba(244, 247, 239, 0.85);
 }
 
 .resume-section button {
-        font-family: GeneralSans-Bold, sans-serif;
-        text-decoration: none;
-        color: var(--light);
-        background-color: red;
-        padding: 0.5em 1em;
-        border-radius: 1em;
-        margin-top: 0.5em;
+  font-family: var(--font-display);
+  color: var(--dark);
+  background: var(--light);
+  padding: 0.65rem 1.1rem;
+  border-radius: var(--radius-pill);
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  align-self: flex-start;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.resume-section button:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }

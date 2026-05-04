@@ -1,7 +1,9 @@
 .home-container {
-        padding: 1em;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-top: 5em;
+  width: min(720px, 100%);
+  margin: 0 auto;
+  padding: var(--page-pad-top) 1.25rem 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.25rem;
 }

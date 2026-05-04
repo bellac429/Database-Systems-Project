@@ -1,52 +1,128 @@
-html{
-        height: 100dvh;    /* Set the root to full viewport height */
-        height: 100vh;     /* Fallback for browsers that do not support dvh */
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        background-color: var(--light);
-        scroll-behavior: auto;
+/* Design tokens — extends existing palette */
+:root {
+  --dark: #01161e;
+  --medium: #124559;
+  --light: #f4f7ef;
+  --blue: #598392;
+  --green: #aec3b0;
+  --surface: rgba(255, 255, 255, 0.06);
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.25rem;
+  --radius-pill: 999px;
+  --shadow-sm: 0 1px 2px rgba(1, 22, 30, 0.06);
+  --shadow-md: 0 8px 24px rgba(1, 22, 30, 0.12);
+  --shadow-lg: 0 20px 50px rgba(1, 22, 30, 0.18);
+  --nav-height: 4.5rem;
+  --page-pad-top: 5.5rem;
+  --font-display: "GeneralSans-Bold", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "GeneralSans-Medium", ui-sans-serif, system-ui, sans-serif;
+  --font-muted: "GeneralSans-Light", ui-sans-serif, system-ui, sans-serif;
 }
 
-body, #root {
-        height: 100%;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        background-color: var(--light);
-        scroll-behavior: auto;
-}
-      
-/*************************************COLOR THEME************************************************************/
-:root{
-        --dark: #01161e;
-        --medium: #124559;
-        --light: #eff6e0;
-        --blue: #598392;
-        --green: #aec3b0;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-/*******************************************FONTS************************************************************/
+html {
+  height: 100dvh;
+  height: 100vh;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--dark);
+  background-color: #e8ede3;
+  background-image:
+    radial-gradient(ellipse 120% 80% at 50% -20%, rgba(18, 69, 89, 0.14), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 100% 50%, rgba(174, 195, 176, 0.35), transparent 45%),
+    radial-gradient(ellipse 50% 40% at 0% 80%, rgba(89, 131, 146, 0.2), transparent 50%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.error {
+  color: #fecaca;
+  background: rgba(127, 29, 29, 0.35);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  margin: 0.5rem 0 0;
+  font-size: 0.9rem;
+  text-align: center;
+  width: 100%;
+  max-width: 100%;
+}
+
+/************************************* FONTS ************************************************************/
 @font-face {
-        font-family: 'GeneralSans-Bold';
-        src: url('./fonts/GeneralSans-Bold.woff2') format('woff2');
-        font-weight: 400;
-        font-style: normal;
-        font-display: swap;
+  font-family: "GeneralSans-Bold";
+  src: url("./fonts/GeneralSans-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-        font-family: 'GeneralSans-Medium,';
-        src: url('./fonts/GeneralSans-Medium.woff2') format('woff2');
-        font-weight: 400;
-        font-style: normal;
-        font-display: swap;
+  font-family: "GeneralSans-Medium";
+  src: url("./fonts/GeneralSans-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-        font-family: 'GeneralSans-Light';
-        src: url('./fonts/GeneralSans-Light.woff2') format('woff2');
-        font-weight: 400;
-        font-style: normal;
-        font-display: swap;
+  font-family: "GeneralSans-Light";
+  src: url("./fonts/GeneralSans-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
 }
