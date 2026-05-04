@@ -880,6 +880,63 @@ app.get("/api/applications/draft", async (req, res) => {
   }
 });
 
+app.get("/api/applications/:applicationId", async (req, res) => {
+  const applicationId = Number(req.params.applicationId);
+  const userId = Number(req.query.userId);
+
+  if (!Number.isInteger(applicationId)) {
+    return res.status(400).json({ ok: false, error: "Invalid applicationId" });
+  }
+  if (!Number.isInteger(userId)) {
+    return res.status(400).json({ ok: false, error: "Invalid userId" });
+  }
+
+  try {
+    const [rows] = await pool.query(
+      `
+      SELECT
+        a.applicationID,
+        a.userID,
+        a.listingID,
+        a.resumeID,
+        a.status,
+        a.createTime,
+        a.submitTime,
+        r.fileName AS resumeFileName
+      FROM Application a
+      LEFT JOIN Resume r ON r.resumeID = a.resumeID
+      WHERE a.applicationID = ? AND a.userID = ?
+      `,
+      [applicationId, userId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ ok: false, error: "Application not found" });
+    }
+
+    const application = rows[0];
+
+    const [answers] = await pool.query(
+      `
+      SELECT questionID, answerText
+      FROM Application_Answers
+      WHERE applicationID = ?
+      `,
+      [applicationId]
+    );
+
+    return res.json({
+      ok: true,
+      data: {
+        application,
+        answers,
+      },
+    });
+  } catch (err) {
+    return toApiError(res, err);
+  }
+});
+
 app.patch("/api/applications/:applicationId", async (req, res) => {
   const applicationId = Number(req.params.applicationId);
 
@@ -893,6 +950,22 @@ app.patch("/api/applications/:applicationId", async (req, res) => {
 
   try {
     await conn.beginTransaction();
+
+    const [existingRows] = await conn.query(
+      `SELECT status FROM Application WHERE applicationID = ?`,
+      [applicationId]
+    );
+    if (existingRows.length === 0) {
+      await conn.rollback();
+      return res.status(404).json({ ok: false, error: "Application not found" });
+    }
+    if (existingRows[0].status !== "draft") {
+      await conn.rollback();
+      return res.status(403).json({
+        ok: false,
+        error: "Only draft applications can be modified",
+      });
+    }
 
     // update main application
     await conn.query(

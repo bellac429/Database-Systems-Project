@@ -1,9 +1,14 @@
 import './ApplicationEntry.css'
 import { Link } from 'react-router-dom'
 
-function ApplicationEntry({companyName, description, dueDate, status, listingID}) {
+function ApplicationEntry({ companyName, description, dueDate, status, listingID, applicationID }) {
+        const applyPath =
+                status === "draft"
+                        ? `/apply/${listingID}`
+                        : `/apply/${listingID}?applicationId=${applicationID}&readonly=1`;
+
         return(
-                <Link className='application-entry-container' to={`/apply/${listingID}`}>
+                <Link className='application-entry-container' to={applyPath}>
                         <div className='application-entry-company'>
                                 <div className='application-entry-company-icon'></div>
                                 <div className='application-entry-company-name'>
@@ -18,7 +23,7 @@ function ApplicationEntry({companyName, description, dueDate, status, listingID}
                         <div className='application-entry-status'>
                                 <h3>status: {status}</h3>
                                 <span className='application-entry-cta'>
-                                        {status === "draft" ? "Continue" : "Open"}
+                                        {status === "draft" ? "Continue" : "View"}
                                 </span>
                         </div>
                 </Link>
