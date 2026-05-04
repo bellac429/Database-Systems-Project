@@ -31,12 +31,18 @@ function Register() {
                   .finally(() => setLoading(false));
               }, [user]);
 
-        if (loading) return <p>Loading...</p>;
+        if (loading) return <p className="loading-state">Loading applications…</p>;
 
         console.log(applications);
 
         return(
                 <div className='applications-container'>
+                        <header className="page-hero">
+                                <h1 className="page-title">Your applications</h1>
+                                <p className="page-subtitle">
+                                        Track status, continue drafts, or reopen an application from any row below.
+                                </p>
+                        </header>
                         { applications.map(application => (
                                 <ApplicationEntry 
                                 key={application.applicationID} 

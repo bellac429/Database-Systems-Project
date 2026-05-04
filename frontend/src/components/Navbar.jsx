@@ -18,7 +18,8 @@ function Navbar() {
     }
 
     return (
-        <nav className="navbar">
+        <nav className="navbar" aria-label="Main navigation">
+                <div className="navbar-inner">
                 <div className="logo">LOGO</div>
 
                 <div className="links">
@@ -47,8 +48,7 @@ function Navbar() {
                             <button onClick={handleLogout}>Log Out</button>
                             </>
                         )}
-                        
-                        
+                </div>
                 </div>
         </nav>
     )

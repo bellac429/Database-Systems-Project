@@ -166,7 +166,7 @@ function JobApply() {
     }
   }
 
-  if (!jobListing) return <p>Loading...</p>
+  if (!jobListing) return <p className="loading-state">Loading application…</p>
 
   return (
     <div className="job-apply-container">

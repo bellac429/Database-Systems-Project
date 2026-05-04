@@ -1,3 +1,13 @@
+/* Inner flex — shared by mobile pill + desktop bar */
+.navbar-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+/* Default: compact floating nav (phones / small tablets) */
 .navbar {
   position: fixed;
   top: 0;
@@ -7,10 +17,6 @@
   width: min(1120px, calc(100% - 2rem));
   margin: 1rem auto 0;
   padding: 0.65rem 1.25rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
   background: linear-gradient(135deg, rgba(18, 69, 89, 0.97), rgba(1, 22, 30, 0.92));
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -74,4 +80,48 @@
 
 .navbar button:active {
   transform: translateY(0);
+}
+
+/* Desktop: full-width header aligned with main content */
+@media (min-width: 900px) {
+  .navbar {
+    left: 0;
+    right: 0;
+    transform: none;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    border-bottom: 1px solid rgba(244, 247, 239, 0.1);
+    box-shadow: 0 4px 24px rgba(1, 22, 30, 0.1);
+  }
+
+  .navbar-inner {
+    max-width: var(--layout-max);
+    margin: 0 auto;
+    padding: 0.85rem var(--page-gutter);
+  }
+
+  .logo {
+    font-size: 1.15rem;
+    letter-spacing: 0.08em;
+  }
+
+  .links {
+    gap: 0.35rem 0.65rem;
+  }
+
+  .links a {
+    font-size: 0.9375rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .navbar button {
+    padding: 0.5rem 1.15rem;
+    font-size: 0.9375rem;
+  }
 }

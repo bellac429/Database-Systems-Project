@@ -138,8 +138,11 @@ function PostedListings() {
         if (loading) {
                 return (
                         <div className='posted-listings-container'>
-                                <h1>Posted Listings</h1>
-                                <p>Loading...</p>
+                                <header className="page-hero">
+                                        <h1 className="page-title">Posted listings</h1>
+                                        <p className="page-subtitle">Manage roles you’ve published for students.</p>
+                                </header>
+                                <p className="loading-state loading-state--inline">Loading…</p>
                         </div>
                 );
         }
@@ -147,20 +150,29 @@ function PostedListings() {
         if (!user) {
                 return (
                         <div className='posted-listings-container'>
-                                <h1>Posted Listings</h1>
-                                <p>Please log in as a company to view your listings.</p>
+                                <header className="page-hero">
+                                        <h1 className="page-title">Posted listings</h1>
+                                        <p className="page-subtitle">Sign in with a company account to manage your job postings.</p>
+                                </header>
+                                <p className="empty-state">Please log in as a company to view your listings.</p>
                         </div>
                 );
         }
 
         return(
                 <div className='posted-listings-container'>
-                        <h1>Posted Listings</h1>
+                        <header className="page-hero">
+                                <h1 className="page-title">Posted listings</h1>
+                                <p className="page-subtitle">
+                                        Select a listing to edit its description, external link, and due date.
+                                </p>
+                        </header>
                         {error && <p className="error">{error}</p>}
                         {!error && listings.length === 0 && (
-                                <p>No listings posted yet.</p>
+                                <p className="empty-state">No listings posted yet.</p>
                         )}
 
+                        <div className="posted-listings-workspace">
                         <div className="posted-listings-list">
                                 {listings.map((listing) => (
                                         <button
@@ -218,6 +230,7 @@ function PostedListings() {
                                         </button>
                                 </form>
                         )}
+                        </div>
                 </div>
         )
 }

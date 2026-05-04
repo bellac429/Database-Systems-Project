@@ -18,12 +18,18 @@ function Home() {
                   .finally(() => setLoading(false));
               }, []);
 
-        if (loading) return <p>Loading...</p>;
+        if (loading) return <p className="loading-state">Loading listings…</p>;
 
         console.log(listings)
 
         return(
                 <div className="home-container">
+                        <header className="page-hero">
+                                <h1 className="page-title">Open listings</h1>
+                                <p className="page-subtitle">
+                                        Browse open roles and apply in a few steps. Click a card to view details and submit your application.
+                                </p>
+                        </header>
                         { listings.map(listing => (
                                 <JobEntry 
                                 key={listing.listingID} 

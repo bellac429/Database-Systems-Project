@@ -1,25 +1,48 @@
 .posted-listings-container {
   width: min(var(--page-max), 100%);
+  max-width: var(--layout-max);
   margin: 0 auto;
-  padding: var(--page-pad-top) var(--page-gutter) 3rem;
+  padding: var(--page-pad-top) var(--page-gutter) 4rem;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 1.25rem;
+  gap: 0.75rem;
 }
 
-.posted-listings-container > h1 {
-  font-family: var(--font-display);
-  font-size: clamp(1.5rem, 3vw, 1.85rem);
-  color: var(--dark);
-  margin: 0;
-  letter-spacing: -0.02em;
+.posted-listings-container .page-hero {
+  margin-bottom: 0.35rem;
 }
 
-.posted-listings-container > p {
-  margin: 0;
-  color: rgba(1, 22, 30, 0.75);
-  font-family: var(--font-body);
+.posted-listings-container .error {
+  align-self: stretch;
+}
+
+.posted-listings-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+@media (min-width: 1100px) {
+  .posted-listings-workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .posted-listings-list {
+    max-height: calc(100vh - 12rem);
+    overflow-y: auto;
+    padding-right: 0.35rem;
+  }
+
+  .edit-listing-form {
+    position: sticky;
+    top: calc(var(--page-pad-top) + 0.5rem);
+    margin-top: 0;
+  }
 }
 
 .posted-listings-list {
@@ -79,7 +102,7 @@
 
 .edit-listing-form {
   width: 100%;
-  margin-top: 0.5rem;
+  margin-top: 0;
   background: linear-gradient(165deg, rgba(18, 69, 89, 0.98), rgba(1, 22, 30, 0.94));
   color: var(--light);
   border-radius: var(--radius-lg);

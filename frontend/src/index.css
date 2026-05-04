@@ -1,4 +1,4 @@
-/* Design tokens — extends existing palette */
+/* Design tokens — desktop-first layout width, fluid on smaller screens */
 :root {
   --dark: #01161e;
   --medium: #124559;
@@ -16,12 +16,41 @@
   --nav-height: 4.5rem;
   --page-pad-top: 5.5rem;
   --page-gutter: clamp(1rem, 4vw, 1.5rem);
-  /* Wide shell (listings editor); feeds use --feed-max */
+  /* Canonical content width — aligns nav + main columns */
+  --layout-max: 1120px;
   --page-max: 960px;
   --feed-max: 720px;
+  --form-max: 440px;
   --font-display: "GeneralSans-Bold", ui-sans-serif, system-ui, sans-serif;
   --font-body: "GeneralSans-Medium", ui-sans-serif, system-ui, sans-serif;
   --font-muted: "GeneralSans-Light", ui-sans-serif, system-ui, sans-serif;
+}
+
+@media (min-width: 900px) {
+  :root {
+    --page-gutter: clamp(1.5rem, 4vw, 2.75rem);
+    --page-pad-top: 6rem;
+    --layout-max: 1160px;
+    --page-max: 1040px;
+    --feed-max: 960px;
+  }
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --layout-max: 1200px;
+    --page-max: 1140px;
+    --feed-max: 1080px;
+    --form-max: 460px;
+  }
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --layout-max: 1280px;
+    --page-max: 1220px;
+    --feed-max: 1160px;
+  }
 }
 
 *,
@@ -67,6 +96,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+@media (min-width: 900px) {
+  body {
+    font-size: 1.0625rem;
+    line-height: 1.6;
+  }
+}
+
 #root {
   min-height: 100%;
   display: flex;
@@ -107,6 +143,54 @@ button:focus-visible {
   text-align: center;
   width: 100%;
   max-width: 100%;
+}
+
+/* Page framing — consistent hierarchy on wide screens */
+.page-hero {
+  grid-column: 1 / -1;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid rgba(1, 22, 30, 0.08);
+  margin-bottom: 0.25rem;
+}
+
+.page-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.65rem, 2.8vw, 2.35rem);
+  color: var(--dark);
+  letter-spacing: -0.035em;
+  margin: 0 0 0.45rem;
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+.page-subtitle {
+  margin: 0 0 1.35rem;
+  font-size: clamp(0.95rem, 1.35vw, 1.1rem);
+  color: rgba(1, 22, 30, 0.58);
+  max-width: 52ch;
+  line-height: 1.55;
+}
+
+.loading-state {
+  margin: var(--page-pad-top) auto 4rem;
+  padding: 3rem var(--page-gutter);
+  max-width: var(--layout-max);
+  text-align: center;
+  color: rgba(1, 22, 30, 0.5);
+  font-size: 1.05rem;
+}
+
+.loading-state--inline {
+  margin: 1rem 0 2rem;
+  padding: 1rem;
+}
+
+.empty-state {
+  margin: 0;
+  padding: 1.25rem 0;
+  color: rgba(1, 22, 30, 0.58);
+  font-size: 1rem;
+  max-width: 52ch;
 }
 
 /************************************* FONTS ************************************************************/

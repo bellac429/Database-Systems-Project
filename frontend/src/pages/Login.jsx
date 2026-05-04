@@ -43,8 +43,13 @@ function Login() {
 
         return(
                 <div className="login-container">
+                        <header className="page-hero page-hero--auth">
+                                <h1 className="page-title">Log in</h1>
+                                <p className="page-subtitle">
+                                        Sign in to browse listings, apply to roles, and manage your profile.
+                                </p>
+                        </header>
                         <form className='login-console' onSubmit={handleSubmit}>
-                                <h1>Log In</h1>
                                 <input
                                 type="email"
                                 placeholder="Email"

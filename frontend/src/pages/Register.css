@@ -1,5 +1,6 @@
 .register-container {
-  width: min(calc(100vw - 2 * var(--page-gutter)), 520px);
+  width: min(calc(100vw - 2 * var(--page-gutter)), var(--layout-max));
+  max-width: 560px;
   min-height: calc(100vh - var(--page-pad-top) - 2rem);
   margin: var(--page-pad-top) auto 2rem;
   padding: 2rem var(--page-gutter);
@@ -7,11 +8,24 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 1.75rem;
   background: transparent;
 }
 
+.register-container .page-hero {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  text-align: center;
+}
+
+.register-container .page-subtitle {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .register-console {
-  width: min(100%, 400px);
+  width: min(100%, var(--form-max));
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -22,15 +36,6 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   border: 1px solid rgba(244, 247, 239, 0.1);
-}
-
-.register-console h1 {
-  text-align: center;
-  font-family: var(--font-display);
-  color: var(--light);
-  margin: 0 0 0.35rem;
-  font-size: 1.65rem;
-  letter-spacing: -0.02em;
 }
 
 .register-console input,

@@ -14,16 +14,18 @@ function App() {
   return (
     <div className="app-container">
       <Navbar />
-      <Routes> 
-        <Route path="/" element={<Home />} />
-        <Route path="/applications/:id" element={<Applications />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/profile/:id" element={<Profile />} />
-        <Route path="/createlisting" element={<CreateListing />} />
-        <Route path="/listings" element={<PostedListings />} />
-        <Route path="/apply/:id" element={<JobApply />} />
-      </Routes>
+      <main className="site-main">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/applications/:id" element={<Applications />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/profile/:id" element={<Profile />} />
+          <Route path="/createlisting" element={<CreateListing />} />
+          <Route path="/listings" element={<PostedListings />} />
+          <Route path="/apply/:id" element={<JobApply />} />
+        </Routes>
+      </main>
     </div>
   )
 }

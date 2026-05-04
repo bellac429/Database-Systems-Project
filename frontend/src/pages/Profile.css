@@ -1,5 +1,5 @@
 .profile-container {
-  width: min(calc(100vw - 2 * var(--page-gutter)), 960px);
+  width: min(calc(100vw - 2 * var(--page-gutter)), var(--layout-max));
   min-height: calc(100vh - var(--page-pad-top) - 2rem);
   margin: var(--page-pad-top) auto 2rem;
   padding: 2rem var(--page-gutter);

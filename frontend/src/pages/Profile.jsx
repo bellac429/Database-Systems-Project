@@ -215,7 +215,7 @@ function Profile() {
                 }
         }
 
-        if (loading) return <p>Loading...</p>;
+        if (loading) return <p className="loading-state">Loading profile…</p>;
 
         if (user?.role === "company") {
                 return (

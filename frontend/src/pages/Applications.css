@@ -1,9 +1,24 @@
 .applications-container {
   width: min(var(--feed-max), 100%);
+  max-width: var(--layout-max);
   margin: 0 auto;
-  padding: var(--page-pad-top) var(--page-gutter) 3rem;
+  padding: var(--page-pad-top) var(--page-gutter) 4rem;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 1.25rem;
+  gap: 1.35rem;
+}
+
+@media (min-width: 1100px) {
+  .applications-container {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1.75rem;
+    row-gap: 1.5rem;
+    align-content: start;
+  }
+
+  .applications-container .page-hero {
+    margin-bottom: 0.5rem;
+  }
 }

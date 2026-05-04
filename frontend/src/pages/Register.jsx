@@ -47,9 +47,13 @@ function Register() {
 
   return (
     <div className="register-container">
+      <header className="page-hero page-hero--auth">
+        <h1 className="page-title">Create an account</h1>
+        <p className="page-subtitle">
+          Join as a student or company to post jobs or apply in one place.
+        </p>
+      </header>
       <form className='register-console' onSubmit={handleSubmit}>
-        <h1>Register</h1>
-
         {/* Role selector */}
         <select value={role} onChange={e => setRole(e.target.value)}>
           <option value="student">Student</option>
