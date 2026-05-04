@@ -1,6 +1,21 @@
 import './Profile.css'
 import { useState, useEffect } from 'react';
 
+function initialsFromName(first, last) {
+        const a = (first || '').trim().charAt(0);
+        const b = (last || '').trim().charAt(0);
+        const s = `${a}${b}`.toUpperCase();
+        return s || '?';
+}
+
+function initialsFromCompany(name) {
+        const words = (name || '').trim().split(/\s+/).filter(Boolean);
+        if (words.length >= 2) {
+                return (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
+        }
+        return (name || 'C').trim().charAt(0).toUpperCase() || '?';
+}
+
 function Profile() {
         const [user, setUser] = useState(null);
         const [profile, setProfile] = useState(null);
@@ -9,13 +24,12 @@ function Profile() {
         const [formData, setFormData] = useState({});
         const [resume, setResume] = useState(null);
         const [resumeFile, setResumeFile] = useState(null);
-        //get user info
+
         useEffect(() => {
                 const storedUser = JSON.parse(localStorage.getItem("user") || "null");
                 setUser(storedUser);
         }, []);
 
-        //get profile info
         useEffect(() => {
                 if (!user) {
                         setLoading(false);
@@ -39,7 +53,6 @@ function Profile() {
                   .finally(() => setLoading(false));
         }, [user]);
 
-        //get user resume
         useEffect(() => {
                 if (!user || user.role !== "student") return;
               
@@ -164,7 +177,6 @@ function Profile() {
                     return;
                   }
               
-                  // update UI
                   const updatedProfile = {
                     ...profile,
                     firstName: formData.firstName,
@@ -191,14 +203,14 @@ function Profile() {
                   return;
                 }
               
-                const formData = new FormData();
-                formData.append("resume", resumeFile);
-                formData.append("userId", user.userID);
+                const formDataUpload = new FormData();
+                formDataUpload.append("resume", resumeFile);
+                formDataUpload.append("userId", user.userID);
               
                 try {
                   const res = await fetch("http://localhost:5001/api/upload-resume", {
                     method: "POST",
-                    body: formData
+                    body: formDataUpload
                   });
               
                   const data = await res.json();
@@ -206,7 +218,6 @@ function Profile() {
                   if (data.ok) {
                     alert("Uploaded!");
               
-                    // refresh resume
                     setResume(data.data);
                   }
               
@@ -218,161 +229,282 @@ function Profile() {
         if (loading) return <p className="loading-state">Loading profile…</p>;
 
         if (user?.role === "company") {
-                return (
-                        <div className='profile-container'>
-                                <div className='profile'>
-                                        {isEditing ? (
-                                                <>
-                                                <h1>Edit Company Profile</h1>
-                                                <p>Company Name</p>
-                                                <input
-                                                        name="companyName"
-                                                        value={formData.companyName || ""}
-                                                        onChange={handleChange}
-                                                />
-                                                <p>Email</p>
-                                                <input
-                                                        name="email"
-                                                        type="email"
-                                                        value={formData.email || ""}
-                                                        onChange={handleChange}
-                                                />
-                                                <p>Phone</p>
-                                                <input
-                                                        name="phone"
-                                                        value={formData.phone || ""}
-                                                        onChange={handleChange}
-                                                />
-                                                <p>Address</p>
-                                                <input
-                                                        name="address"
-                                                        value={formData.address || ""}
-                                                        onChange={handleChange}
-                                                />
+                const displayName = profile?.companyName || "Company";
+                const headline = "Employer · Hiring on this platform";
 
-                                                <button onClick={handleSave}>Save</button>
-                                                <button onClick={() => {
-                                                        setFormData(profile);
-                                                        setIsEditing(false);
-                                                }}>
-                                                Cancel
-                                                </button>
-                                                </>
-                                        ) : (
-                                                <>
-                                                <h1>{profile?.companyName || "Company Profile"}</h1>
-                                                <p><strong>User ID:</strong> {profile?.userID || "N/A"}</p>
-                                                <p><strong>Email:</strong> {profile?.email || "N/A"}</p>
-                                                <p><strong>Phone:</strong> {profile?.phone || "N/A"}</p>
-                                                <p><strong>Address:</strong> {profile?.address || "N/A"}</p>
-                                                <button onClick={() => setIsEditing(true)}>Edit Profile</button>
-                                                </>
-                                        )}
+                return (
+                        <div className="profile-container">
+                                <header className="page-hero profile-page-hero">
+                                        <h1 className="page-title">Company profile</h1>
+                                        <p className="page-subtitle">
+                                                Information visible to candidates and used when you post listings.
+                                        </p>
+                                </header>
+
+                                <div className="profile-layout profile-layout--company">
+                                        <article className="profile-shell">
+                                                <div className="profile-hero-panel">
+                                                <div className="profile-hero-body">
+                                                        <div className="profile-avatar profile-avatar--company" aria-hidden="true">
+                                                                {initialsFromCompany(profile?.companyName)}
+                                                        </div>
+                                                        <div className="profile-identity">
+                                                                {isEditing ? (
+                                                                        <>
+                                                                        <h2 className="profile-name">Edit organization</h2>
+                                                                        <p className="profile-headline">{headline}</p>
+                                                                        </>
+                                                                ) : (
+                                                                        <>
+                                                                        <h2 className="profile-name">{displayName}</h2>
+                                                                        <p className="profile-headline">{headline}</p>
+                                                                        </>
+                                                                )}
+                                                                <div className="profile-actions">
+                                                                        {isEditing ? (
+                                                                                <>
+                                                                                <button type="button" className="profile-btn profile-btn--primary" onClick={handleSave}>Save</button>
+                                                                                <button type="button" className="profile-btn profile-btn--ghost" onClick={() => {
+                                                                                        setFormData(profile);
+                                                                                        setIsEditing(false);
+                                                                                }}>Cancel</button>
+                                                                                </>
+                                                                        ) : (
+                                                                                <button type="button" className="profile-btn profile-btn--primary" onClick={() => setIsEditing(true)}>Edit profile</button>
+                                                                        )}
+                                                                </div>
+                                                        </div>
+                                                </div>
+                                                </div>
+
+                                                <div className="profile-body">
+                                                        {isEditing ? (
+                                                                <section className="profile-section-card">
+                                                                        <h3 className="profile-section-title">Organization</h3>
+                                                                        <div className="profile-form-grid">
+                                                                                <div className="profile-field">
+                                                                                        <label className="profile-label" htmlFor="pf-co-name">Company name</label>
+                                                                                        <input id="pf-co-name" name="companyName" value={formData.companyName || ""} onChange={handleChange} />
+                                                                                </div>
+                                                                                <div className="profile-field">
+                                                                                        <label className="profile-label" htmlFor="pf-co-email">Email</label>
+                                                                                        <input id="pf-co-email" name="email" type="email" value={formData.email || ""} onChange={handleChange} />
+                                                                                </div>
+                                                                                <div className="profile-field">
+                                                                                        <label className="profile-label" htmlFor="pf-co-phone">Phone</label>
+                                                                                        <input id="pf-co-phone" name="phone" value={formData.phone || ""} onChange={handleChange} />
+                                                                                </div>
+                                                                                <div className="profile-field profile-field--full">
+                                                                                        <label className="profile-label" htmlFor="pf-co-addr">Address</label>
+                                                                                        <input id="pf-co-addr" name="address" value={formData.address || ""} onChange={handleChange} />
+                                                                                </div>
+                                                                        </div>
+                                                                </section>
+                                                        ) : (
+                                                                <>
+                                                                <section className="profile-section-card">
+                                                                        <h3 className="profile-section-title">Contact</h3>
+                                                                        <dl className="profile-dl">
+                                                                                <div className="profile-dl-row">
+                                                                                        <dt>Email</dt>
+                                                                                        <dd>{profile?.email || "—"}</dd>
+                                                                                </div>
+                                                                                <div className="profile-dl-row">
+                                                                                        <dt>Phone</dt>
+                                                                                        <dd>{profile?.phone || "—"}</dd>
+                                                                                </div>
+                                                                                <div className="profile-dl-row">
+                                                                                        <dt>Address</dt>
+                                                                                        <dd>{profile?.address || "—"}</dd>
+                                                                                </div>
+                                                                        </dl>
+                                                                </section>
+                                                                <section className="profile-section-card profile-section-card--muted">
+                                                                        <h3 className="profile-section-title">Account</h3>
+                                                                        <p className="profile-meta-line"><span className="profile-meta-label">User ID</span> {profile?.userID ?? "—"}</p>
+                                                                </section>
+                                                                </>
+                                                        )}
+                                                </div>
+                                        </article>
                                 </div>
                         </div>
                 );
         }
 
+        const studentName = profile
+                ? `${profile.firstName || ""} ${profile.lastName || ""}`.trim() || "Student"
+                : "Student";
+        const studentHeadline = profile
+                ? [profile.major, profile.year ? `Year ${profile.year}` : null, profile.gpa != null ? `GPA ${profile.gpa}` : null]
+                        .filter(Boolean)
+                        .join(" · ")
+                : "Add your education details to stand out to employers.";
+
         return(
-                <div className='profile-container'>
-                        <div className='profile'>
-                                {isEditing ? (
-                                        <>
-                                        <p>First Name</p>
-                                        <input
-                                                name="firstName"
-                                                value={formData.firstName || ""}
-                                                onChange={handleChange}
-                                        />
-                                        <p>Last Name</p>
-                                        <input
-                                                name="lastName"
-                                                value={formData.lastName || ""}
-                                                onChange={handleChange}
-                                        />
-                                        <p>Major</p>
-                                        <input
-                                                name="major"
-                                                value={formData.major || ""}
-                                                onChange={handleChange}
-                                        />
-                                        <p>Year</p>
-                                        <input
-                                                name="year"
-                                                type="number"
-                                                min="1"
-                                                max="8"
-                                                value={formData.year || ""}
-                                                onChange={handleChange}
-                                        />
-                                        <p>DOB</p>
-                                        <input
-                                                name="dob"
-                                                type="date"
-                                                value={formData.dob ? formData.dob.split("T")[0] : ""}
-                                                onChange={handleChange}
-                                        />
-                                        <p>GPA</p>
-                                        <input
-                                                name="gpa"
-                                                type="number"
-                                                step="0.01"
-                                                min="0"
-                                                max="4"
-                                                value={formData.gpa || ""}
-                                                onChange={handleChange}
-                                        />
+                <div className="profile-container">
+                        <header className="page-hero profile-page-hero">
+                                <h1 className="page-title">Your profile</h1>
+                                <p className="page-subtitle">
+                                        This is how you present yourself to companies — similar to a Handshake or LinkedIn profile.
+                                </p>
+                        </header>
 
-                                        <button onClick={handleSave}>Save</button>
-                                        <button onClick={() => {
-                                                setFormData(profile);
-                                                setIsEditing(false);
-                                        }}>
-                                        Cancel
-                                        </button>
-                                        </>
-                                ) : (
-                                        <>
-                                        <h1>
-                                                {profile
-                                                ? `${profile.firstName} ${profile.lastName}`
-                                                : "No profile found"}
-                                        </h1>
+                        <div className="profile-layout">
+                                <div className="profile-main">
+                                        <article className="profile-shell">
+                                                <div className="profile-hero-panel">
+                                                <div className="profile-hero-body">
+                                                        <div className="profile-avatar" aria-hidden="true">
+                                                                {initialsFromName(profile?.firstName, profile?.lastName)}
+                                                        </div>
+                                                        <div className="profile-identity">
+                                                                {isEditing ? (
+                                                                        <>
+                                                                        <h2 className="profile-name">Edit profile</h2>
+                                                                        <p className="profile-headline">Update your education and contact information</p>
+                                                                        </>
+                                                                ) : (
+                                                                        <>
+                                                                        <h2 className="profile-name">{studentName}</h2>
+                                                                        <p className="profile-headline">{studentHeadline}</p>
+                                                                        </>
+                                                                )}
+                                                                <div className="profile-actions">
+                                                                        {isEditing ? (
+                                                                                <>
+                                                                                <button type="button" className="profile-btn profile-btn--primary" onClick={handleSave}>Save</button>
+                                                                                <button type="button" className="profile-btn profile-btn--ghost" onClick={() => {
+                                                                                        setFormData(profile);
+                                                                                        setIsEditing(false);
+                                                                                }}>Cancel</button>
+                                                                                </>
+                                                                        ) : (
+                                                                                <button type="button" className="profile-btn profile-btn--primary" onClick={() => setIsEditing(true)}>Edit profile</button>
+                                                                        )}
+                                                                </div>
+                                                        </div>
+                                                </div>
+                                                </div>
 
-                                        <p><strong>Email:</strong> {profile?.email || "N/A"}</p>
-                                        <p><strong>Major:</strong> {profile?.major || "N/A"}</p>
-                                        <p><strong>Year:</strong> {profile?.year || "N/A"}</p>
-                                        <p><strong>DOB:</strong> {profile?.dob || "N/A"}</p>
-                                        <p><strong>GPA:</strong> {profile?.gpa || "N/A"}</p>
-                                        <p><strong>Skills:</strong> {profile?.skill || "N/A"}</p>
+                                                <div className="profile-body">
+                                                        {isEditing ? (
+                                                                <section className="profile-section-card">
+                                                                        <h3 className="profile-section-title">Basics</h3>
+                                                                        <div className="profile-form-grid">
+                                                                                <div className="profile-field">
+                                                                                        <label className="profile-label" htmlFor="pf-st-first">First name</label>
+                                                                                        <input id="pf-st-first" name="firstName" value={formData.firstName || ""} onChange={handleChange} />
+                                                                                </div>
+                                                                                <div className="profile-field">
+                                                                                        <label className="profile-label" htmlFor="pf-st-last">Last name</label>
+                                                                                        <input id="pf-st-last" name="lastName" value={formData.lastName || ""} onChange={handleChange} />
+                                                                                </div>
+                                                                                <div className="profile-field profile-field--full">
+                                                                                        <label className="profile-label" htmlFor="pf-st-email">Email</label>
+                                                                                        <input id="pf-st-email" name="email" readOnly disabled value={profile?.email || ""} />
+                                                                                </div>
+                                                                        </div>
+                                                                </section>
+                                                        ) : (
+                                                                <section className="profile-section-card">
+                                                                        <h3 className="profile-section-title">Contact</h3>
+                                                                        <dl className="profile-dl profile-dl--single">
+                                                                                <div className="profile-dl-row">
+                                                                                        <dt>Email</dt>
+                                                                                        <dd>{profile?.email || "—"}</dd>
+                                                                                </div>
+                                                                        </dl>
+                                                                </section>
+                                                        )}
 
-                                        <button onClick={() => setIsEditing(true)}>Edit Profile</button>
-                                        </>
-                                )}
-                        </div>
-                        <div className="resume-section">
-                                <h3>Resume</h3>
+                                                        {isEditing ? (
+                                                                <section className="profile-section-card">
+                                                                        <h3 className="profile-section-title">Education</h3>
+                                                                        <div className="profile-form-grid">
+                                                                                <div className="profile-field">
+                                                                                        <label className="profile-label" htmlFor="pf-st-major">Major</label>
+                                                                                        <input id="pf-st-major" name="major" value={formData.major || ""} onChange={handleChange} />
+                                                                                </div>
+                                                                                <div className="profile-field">
+                                                                                        <label className="profile-label" htmlFor="pf-st-year">Year</label>
+                                                                                        <input id="pf-st-year" name="year" type="number" min="1" max="8" value={formData.year || ""} onChange={handleChange} />
+                                                                                </div>
+                                                                                <div className="profile-field">
+                                                                                        <label className="profile-label" htmlFor="pf-st-gpa">GPA</label>
+                                                                                        <input id="pf-st-gpa" name="gpa" type="number" step="0.01" min="0" max="4" value={formData.gpa || ""} onChange={handleChange} />
+                                                                                </div>
+                                                                                <div className="profile-field">
+                                                                                        <label className="profile-label" htmlFor="pf-st-dob">Date of birth</label>
+                                                                                        <input id="pf-st-dob" name="dob" type="date" value={formData.dob ? formData.dob.split("T")[0] : ""} onChange={handleChange} />
+                                                                                </div>
+                                                                        </div>
+                                                                </section>
+                                                        ) : (
+                                                                <section className="profile-section-card">
+                                                                        <h3 className="profile-section-title">Education</h3>
+                                                                        <dl className="profile-dl">
+                                                                                <div className="profile-dl-row">
+                                                                                        <dt>Major</dt>
+                                                                                        <dd>{profile?.major || "—"}</dd>
+                                                                                </div>
+                                                                                <div className="profile-dl-row">
+                                                                                        <dt>Year</dt>
+                                                                                        <dd>{profile?.year ?? "—"}</dd>
+                                                                                </div>
+                                                                                <div className="profile-dl-row">
+                                                                                        <dt>GPA</dt>
+                                                                                        <dd>{profile?.gpa ?? "—"}</dd>
+                                                                                </div>
+                                                                                <div className="profile-dl-row">
+                                                                                        <dt>Date of birth</dt>
+                                                                                        <dd>{profile?.dob ? String(profile.dob).split("T")[0] : "—"}</dd>
+                                                                                </div>
+                                                                                <div className="profile-dl-row">
+                                                                                        <dt>Skills</dt>
+                                                                                        <dd>{profile?.skill || "—"}</dd>
+                                                                                </div>
+                                                                        </dl>
+                                                                </section>
+                                                        )}
+                                                </div>
+                                        </article>
+                                </div>
 
-                                {resume ? (
-                                        <a
-                                        href={`http://localhost:5001/uploads/${resume.fileName}`}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        >
-                                        View Current Resume
-                                        </a>
-                                ) : (
-                                        <p>No resume uploaded</p>
-                                )}
-                                <input
-                                type="file"
-                                accept="application/pdf"
-                                onChange={(e) => setResumeFile(e.target.files[0])}
-                                />
+                                <aside className="profile-aside">
+                                        <div className="profile-sidebar-card">
+                                                <h3 className="profile-sidebar-title">Resume</h3>
+                                                <p className="profile-sidebar-lead">Recruiters often review your resume alongside this profile.</p>
 
-                                <button onClick={handleResumeUpload}>
-                                Upload Resume
-                                </button>
+                                                {resume ? (
+                                                        <a
+                                                                className="profile-resume-link"
+                                                                href={`http://localhost:5001/uploads/${resume.fileName}`}
+                                                                target="_blank"
+                                                                rel="noreferrer"
+                                                        >
+                                                                View resume
+                                                        </a>
+                                                ) : (
+                                                        <p className="profile-sidebar-empty">No resume uploaded yet.</p>
+                                                )}
+
+                                                <label className="profile-file-label" htmlFor="profile-resume-file">
+                                                        Choose PDF
+                                                </label>
+                                                <input
+                                                        id="profile-resume-file"
+                                                        type="file"
+                                                        accept="application/pdf"
+                                                        className="profile-file-native"
+                                                        onChange={(e) => setResumeFile(e.target.files[0])}
+                                                />
+
+                                                <button type="button" className="profile-btn profile-btn--primary profile-btn--block" onClick={handleResumeUpload}>
+                                                        Upload resume
+                                                </button>
+                                        </div>
+                                </aside>
                         </div>
                 </div>
         )
