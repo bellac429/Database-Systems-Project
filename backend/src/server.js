@@ -375,6 +375,52 @@ app.post("/api/upload-resume", upload.single("resume"), async (req, res) => {
   }
 });
 
+app.delete("/api/students/:userId/resume/:resumeId", async (req, res) => {
+  const userId = Number(req.params.userId);
+  const resumeId = Number(req.params.resumeId);
+
+  if (!Number.isInteger(userId) || !Number.isInteger(resumeId)) {
+    return res.status(400).json({ ok: false, error: "Invalid userId or resumeId" });
+  }
+
+  try {
+    const [rows] = await pool.query(
+      `
+      SELECT resumeID, fileName
+      FROM Resume
+      WHERE resumeID = ? AND userID = ?
+      LIMIT 1
+      `,
+      [resumeId, userId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ ok: false, error: "Resume not found" });
+    }
+
+    const fileName = rows[0].fileName;
+
+    await pool.query(
+      `
+      DELETE FROM Resume
+      WHERE resumeID = ? AND userID = ?
+      `,
+      [resumeId, userId]
+    );
+
+    // Best effort cleanup; DB row deletion is the source of truth.
+    const filePath = path.join(uploadsDir, fileName);
+    fs.unlink(filePath, () => {});
+
+    return res.json({ ok: true, message: "Resume deleted" });
+  } catch (err) {
+    if (err?.sqlState === "45000") {
+      return res.status(409).json({ ok: false, error: err.sqlMessage || err.message });
+    }
+    return toApiError(res, err);
+  }
+});
+
 app.get("/api/students/:userId/applications", async (req, res) => {
   const userId = Number(req.params.userId);
   if (!Number.isInteger(userId)) {

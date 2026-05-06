@@ -233,6 +233,38 @@ function Profile() {
                 }
         }
 
+        async function handleResumeDelete() {
+                if (!user?.userID || !resume?.resumeID) {
+                  alert("No stored resume found to delete.");
+                  return;
+                }
+
+                const confirmed = window.confirm(
+                  "Delete this stored resume? If it is used in an application, the database trigger will block deletion."
+                );
+                if (!confirmed) return;
+
+                try {
+                  const res = await fetch(
+                    `http://localhost:5001/api/students/${user.userID}/resume/${resume.resumeID}`,
+                    { method: "DELETE" }
+                  );
+                  const data = await res.json();
+
+                  if (!data.ok) {
+                    alert(data.error || "Could not delete resume.");
+                    return;
+                  }
+
+                  setResume(null);
+                  setResumeFile(null);
+                  alert("Resume deleted.");
+                } catch (err) {
+                  console.error(err);
+                  alert("Resume delete failed. Check backend logs and try again.");
+                }
+        }
+
         if (loading) return <p className="loading-state">Loading profile…</p>;
 
         if (user?.role === "company") {
@@ -510,6 +542,11 @@ function Profile() {
                                                 <button type="button" className="profile-btn profile-btn--primary profile-btn--block" onClick={handleResumeUpload}>
                                                         Upload resume
                                                 </button>
+                                                {resume && (
+                                                        <button type="button" className="profile-btn profile-btn--danger profile-btn--block" onClick={handleResumeDelete}>
+                                                                Delete stored resume
+                                                        </button>
+                                                )}
                                         </div>
                                 </aside>
                         </div>
