@@ -24,6 +24,11 @@ function Profile() {
         const [formData, setFormData] = useState({});
         const [resume, setResume] = useState(null);
         const [resumeFile, setResumeFile] = useState(null);
+        const [applicationCounts, setApplicationCounts] = useState({
+                submitted: 0,
+                draft: 0,
+                responded: 0
+        });
 
         useEffect(() => {
                 const storedUser = JSON.parse(localStorage.getItem("user") || "null");
@@ -63,6 +68,23 @@ function Profile() {
                       setResume(data.data);
                     }
                   });
+        }, [user]);
+
+        useEffect(() => {
+                if (!user || user.role !== "student") return;
+
+                fetch(`http://localhost:5001/api/students/${user.userID}/applications/status-counts`)
+                  .then(res => res.json())
+                  .then(data => {
+                    if (data.ok) {
+                      setApplicationCounts({
+                        submitted: data.data.submitted || 0,
+                        draft: data.data.draft || 0,
+                        responded: data.data.responded || 0
+                      });
+                    }
+                  })
+                  .catch(err => console.error(err));
         }, [user]);
 
         console.log(profile);
@@ -511,6 +533,26 @@ function Profile() {
                                 </div>
 
                                 <aside className="profile-aside">
+                                        <div className="profile-sidebar-card">
+                                                <h3 className="profile-sidebar-title">Applications</h3>
+                                                <p className="profile-sidebar-lead">Your application activity by status.</p>
+
+                                                <dl className="profile-dl">
+                                                        <div className="profile-dl-row">
+                                                                <dt>Submitted</dt>
+                                                                <dd>{applicationCounts.submitted}</dd>
+                                                        </div>
+                                                        <div className="profile-dl-row">
+                                                                <dt>Draft</dt>
+                                                                <dd>{applicationCounts.draft}</dd>
+                                                        </div>
+                                                        <div className="profile-dl-row">
+                                                                <dt>Responded</dt>
+                                                                <dd>{applicationCounts.responded}</dd>
+                                                        </div>
+                                                </dl>
+                                        </div>
+
                                         <div className="profile-sidebar-card">
                                                 <h3 className="profile-sidebar-title">Resume</h3>
                                                 <p className="profile-sidebar-lead">Recruiters often review your resume alongside this profile.</p>

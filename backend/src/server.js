@@ -1065,3 +1065,44 @@ app.patch("/api/applications/:applicationId", async (req, res) => {
     conn.release();
   }
 });
+
+app.get("/api/students/:userId/applications/status-counts", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const [rows] = await pool.query(
+      `
+      SELECT
+        LOWER(TRIM(status)) AS status,
+        COUNT(*) AS total
+      FROM Application
+      WHERE userID = ?
+      GROUP BY LOWER(TRIM(status))
+      `,
+      [userId]
+    );
+
+    const counts = {
+      submitted: 0,
+      draft: 0,
+      responded: 0
+    };
+
+    rows.forEach(row => {
+      counts[row.status] = Number(row.total);
+    });
+
+    res.json({
+      ok: true,
+      data: counts
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      ok: false,
+      error: err.message
+    });
+  }
+});
