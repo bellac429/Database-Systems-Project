@@ -259,7 +259,6 @@ WHERE a.status = 'submitted';
 	JOIN Student s ON a.userID = s.userID
 	JOIN Listing l ON a.listingID = l.listingID;
 
-	-- # of applications per company
 -- # of applications per company
 SELECT 
     c.companyName,
@@ -303,9 +302,11 @@ GROUP BY c.companyName;
 	SELECT *
 	FROM view_submitted
 	ORDER BY submitTime DESC;
+SELECT * FROM application;
+SELECT CountApplicationsByStatus(1,'submitted') AS submittedApplications;
 
 	-- Use function
-	SELECT CountApplicationsByStatus('submitted') AS submittedApplications;
+	SELECT CountApplicationsByStatus(1, 'submitted') AS submittedApplications;
 
 	-- USE Procedure
 	CALL GetStudentApplications(1);
@@ -373,19 +374,23 @@ GROUP BY c.companyName;
 	END//
 
 	-- Count applications by status
-	CREATE FUNCTION CountApplicationsByStatus(p_status VARCHAR(50))
-	RETURNS INT
-	DETERMINISTIC
-	READS SQL DATA
-	BEGIN
-		DECLARE total INT;
+	CREATE FUNCTION CountApplicationsByStatus(
+    p_account_id INT,
+    p_status VARCHAR(50)
+)
+RETURNS INT
+DETERMINISTIC
+READS SQL DATA
+BEGIN
+    DECLARE total INT;
 
-		SELECT COUNT(*)
-		INTO total
-		FROM Application
-		WHERE status = p_status;
+    SELECT COUNT(*)
+    INTO total
+    FROM Application
+    WHERE userID = p_account_id
+      AND status = p_status;
 
-		RETURN total;
-	END//
+    RETURN total;
+END //
 
 	DELIMITER ;
