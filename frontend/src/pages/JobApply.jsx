@@ -19,6 +19,7 @@ function JobApply() {
   const [applicationId, setApplicationId] = useState(null)
   const [viewOnly, setViewOnly] = useState(false)
   const [loadError, setLoadError] = useState(null)
+  const [submitError, setSubmitError] = useState(null)
 
   useEffect(() => {
     setUser(JSON.parse(localStorage.getItem('user')))
@@ -132,6 +133,8 @@ function JobApply() {
   async function handleSave(status) {
     if (!user || viewOnly) return
 
+    setSubmitError(null)
+
     if (!user.userID) {
       alert('Please log in again before applying.')
       return
@@ -164,10 +167,10 @@ function JobApply() {
           body: JSON.stringify(payload)
         })
 
-        const data = await res.json()
+        const data = await res.json().catch(() => ({ ok: false, error: `Request failed (${res.status})` }))
 
         if (!data.ok) {
-          alert(data.error)
+          setSubmitError(data.error || 'Could not submit application.')
           return
         }
 
@@ -182,10 +185,10 @@ function JobApply() {
           }
         )
 
-        const data = await res.json()
+        const data = await res.json().catch(() => ({ ok: false, error: `Request failed (${res.status})` }))
 
         if (!data.ok) {
-          alert(data.error)
+          setSubmitError(data.error || 'Could not save application.')
           return
         }
       }
@@ -194,6 +197,7 @@ function JobApply() {
       window.location.href = `/applications/${user.userID}`
     } catch (err) {
       console.error(err)
+      setSubmitError('Submission failed. Please try again.')
     }
   }
 
@@ -252,6 +256,8 @@ function JobApply() {
             <button type="button" onClick={() => handleSave('submitted')}>
               Submit Application
             </button>
+
+            {submitError && <p className="job-apply-error">{submitError}</p>}
           </>
         )}
 
