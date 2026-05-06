@@ -132,6 +132,19 @@ function JobApply() {
   async function handleSave(status) {
     if (!user || viewOnly) return
 
+    if (!user.userID) {
+      alert('Please log in again before applying.')
+      return
+    }
+    if (!listingId) {
+      alert('This listing is missing an ID. Please reopen the listing and try again.')
+      return
+    }
+    if (!resumeId) {
+      alert('Please upload a resume in your profile before submitting an application.')
+      return
+    }
+
     const payload = {
       userId: user.userID,
       listingId,

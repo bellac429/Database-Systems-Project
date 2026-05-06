@@ -202,6 +202,10 @@ function Profile() {
                   alert("Select a PDF first");
                   return;
                 }
+                if (!user?.userID) {
+                  alert("Please log in again before uploading a resume.");
+                  return;
+                }
               
                 const formDataUpload = new FormData();
                 formDataUpload.append("resume", resumeFile);
@@ -219,10 +223,13 @@ function Profile() {
                     alert("Uploaded!");
               
                     setResume(data.data);
+                  } else {
+                    alert(data.error || "Resume upload failed.");
                   }
               
                 } catch (err) {
                   console.error(err);
+                  alert("Resume upload failed. Check backend logs and try again.");
                 }
         }
 

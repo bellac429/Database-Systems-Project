@@ -3,6 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { pool } from "./db.js";
 import multer from "multer";
+import fs from "fs";
+import path from "path";
 
 dotenv.config();
 const app = express();
@@ -10,9 +12,14 @@ const app = express();
 app.use(cors({ origin: "http://localhost:5173" }));
 app.use(express.json());
 
+const uploadsDir = path.resolve(process.cwd(), "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    cb(null, uploadsDir);
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + "-" + file.originalname);
@@ -20,7 +27,7 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-app.use("/uploads", express.static("uploads"));
+app.use("/uploads", express.static(uploadsDir));
 
 
 function toApiError(res, err) {
@@ -342,6 +349,9 @@ app.post("/api/upload-resume", upload.single("resume"), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ ok: false, error: "No file uploaded" });
   }
+  if (!Number.isInteger(userId)) {
+    return res.status(400).json({ ok: false, error: "Invalid userId" });
+  }
 
   try {
     const [result] = await pool.query(
@@ -623,8 +633,14 @@ app.patch("/api/listings/:listingId", async (req, res) => {
 
 app.post("/api/applications", async (req, res) => {
   const { userId, listingId, resumeId, status = "draft", submitTime = null, answers = [] } = req.body;
-  if (!userId || !listingId || !resumeId) {
-    return res.status(400).json({ ok: false, error: "userId, listingId, and resumeId are required" });
+  if (!userId) {
+    return res.status(400).json({ ok: false, error: "userId is required" });
+  }
+  if (!listingId) {
+    return res.status(400).json({ ok: false, error: "listingId is required" });
+  }
+  if (!resumeId) {
+    return res.status(400).json({ ok: false, error: "resumeId is required" });
   }
 
   const conn = await pool.getConnection();
