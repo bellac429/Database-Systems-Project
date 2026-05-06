@@ -351,6 +351,52 @@ SELECT CountApplicationsByStatus(1,'submitted') AS submittedApplications;
 		WHERE q.listingID = NEW.listingID;
 	END//
 
+	-- Prevent submitted applications after listing deadline
+	CREATE TRIGGER enforce_submit_before_due_insert
+	BEFORE INSERT ON Application
+	FOR EACH ROW
+	BEGIN
+		DECLARE v_dateDue DATETIME;
+
+		IF NEW.status = 'submitted' THEN
+			IF NEW.submitTime IS NULL THEN
+				SET NEW.submitTime = NOW();
+			END IF;
+
+			SELECT dateDue
+			INTO v_dateDue
+			FROM Listing
+			WHERE listingID = NEW.listingID;
+
+			IF v_dateDue IS NULL OR NEW.submitTime > v_dateDue THEN
+				SIGNAL SQLSTATE '45000'
+				SET MESSAGE_TEXT = 'Cannot submit application after listing due date';
+			END IF;
+		END IF;
+	END//
+
+	CREATE TRIGGER enforce_submit_before_due_update
+	BEFORE UPDATE ON Application
+	FOR EACH ROW
+	BEGIN
+		DECLARE v_dateDue DATETIME;
+
+		IF NEW.status = 'submitted' AND OLD.status <> 'submitted' THEN
+			IF NEW.submitTime IS NULL THEN
+				SET NEW.submitTime = NOW();
+			END IF;
+
+			SELECT dateDue
+			INTO v_dateDue
+			FROM Listing
+			WHERE listingID = NEW.listingID;
+
+			IF v_dateDue IS NULL OR NEW.submitTime > v_dateDue THEN
+				SIGNAL SQLSTATE '45000'
+				SET MESSAGE_TEXT = 'Cannot submit application after listing due date';
+			END IF;
+		END IF;
+	END//
 
 	-- ======================================
 	-- PROCEDURE & TASK
