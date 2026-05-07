@@ -19,6 +19,8 @@ function PostedListings() {
         const [listings, setListings] = useState([]);
         const [loading, setLoading] = useState(true);
         const [error, setError] = useState("");
+	const [applicants, setApplicants] = useState([]);
+	const [applicantsLoading, setApplicantsLoading] = useState(false);
         const [selectedListingId, setSelectedListingId] = useState(null);
         const [formData, setFormData] = useState({
                 description: "",
@@ -69,10 +71,43 @@ function PostedListings() {
                 });
         }
 
-        function handleChange(e) {
-                const { name, value } = e.target;
-                setFormData((prev) => ({ ...prev, [name]: value }));
+        async function handleSelectListing(listing) {
+        setSelectedListingId(listing.listingID);
+        setSaveMessage("");
+        setError("");
+        setFormData({
+                description: listing.description || "",
+                externalLink: listing.externalLink || "",
+                dateDue: toDateTimeLocalValue(listing.dateDue),
+        });
+
+        setApplicantsLoading(true);
+        try {
+                const res = await fetch(
+                        `http://localhost:5001/api/listings/${listing.listingID}/applicants?companyUserId=${user.userID}`
+                );
+                const data = await res.json();
+
+                if (data.ok) {
+                        setApplicants(data.data);
+                } else {
+                        setApplicants([]);
+                        setError(data.error || "Failed to load applicants.");
+                }
+        } catch (_err) {
+                setApplicants([]);
+                setError("Something went wrong while loading applicants.");
+        } finally {
+                setApplicantsLoading(false);
         }
+}
+	function handleChange(e) {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+                ...prev,
+                [name]: value,
+        }));
+}
 
         async function handleSave(e) {
                 e.preventDefault();
@@ -192,44 +227,79 @@ function PostedListings() {
                         </div>
 
                         {selectedListingId && (
-                                <form className="edit-listing-form" onSubmit={handleSave}>
-                                        <h2>Edit Listing #{selectedListingId}</h2>
+        <div className="posted-listing-detail">
+                <form className="edit-listing-form" onSubmit={handleSave}>
+                        <h2>Edit Listing #{selectedListingId}</h2>
 
-                                        <label htmlFor="description">Description</label>
-                                        <textarea
-                                                id="description"
-                                                name="description"
-                                                value={formData.description}
-                                                onChange={handleChange}
-                                                maxLength={1000}
-                                        />
+                        <label htmlFor="description">Description</label>
+                        <textarea
+                                id="description"
+                                name="description"
+                                value={formData.description}
+                                onChange={handleChange}
+                                maxLength={1000}
+                        />
 
-                                        <label htmlFor="externalLink">External Link</label>
-                                        <input
-                                                id="externalLink"
-                                                name="externalLink"
-                                                type="text"
-                                                value={formData.externalLink}
-                                                onChange={handleChange}
-                                                maxLength={100}
-                                        />
+                        <label htmlFor="externalLink">External Link</label>
+                        <input
+                                id="externalLink"
+                                name="externalLink"
+                                type="text"
+                                value={formData.externalLink}
+                                onChange={handleChange}
+                                maxLength={100}
+                        />
 
-                                        <label htmlFor="dateDue">Due Date</label>
-                                        <input
-                                                id="dateDue"
-                                                name="dateDue"
-                                                type="datetime-local"
-                                                value={formData.dateDue}
-                                                onChange={handleChange}
-                                                required
-                                        />
+                        <label htmlFor="dateDue">Due Date</label>
+                        <input
+                                id="dateDue"
+                                name="dateDue"
+                                type="datetime-local"
+                                value={formData.dateDue}
+                                onChange={handleChange}
+                                required
+                        />
 
-                                        {saveMessage && <p className="success">{saveMessage}</p>}
-                                        <button type="submit" disabled={saving}>
-                                                {saving ? "Saving..." : "Save Changes"}
-                                        </button>
-                                </form>
+                        {saveMessage && <p className="success">{saveMessage}</p>}
+                        <button type="submit" disabled={saving}>
+                                {saving ? "Saving..." : "Save Changes"}
+                        </button>
+                </form>
+
+                <section className="applicants-panel">
+                        <h2>Applicants</h2>
+
+                        {applicantsLoading ? (
+                                <p className="loading-state loading-state--inline">Loading applicants…</p>
+                        ) : applicants.length === 0 ? (
+                                <p className="empty-state">No students have applied to this listing yet.</p>
+                        ) : (
+                                <div className="applicants-list">
+                                        {applicants.map((applicant) => (
+                                                <article className="applicant-card" key={applicant.applicationID}>
+                                                        <h3>
+                                                                {applicant.firstName} {applicant.lastName}
+                                                        </h3>
+                                                        <p><strong>Email:</strong> {applicant.email}</p>
+                                                        <p><strong>Status:</strong> {applicant.status}</p>
+                                                        <p><strong>Applied:</strong> {new Date(applicant.submittedAt).toLocaleString()}</p>
+
+                                                        {applicant.resumeFileName && (
+                                                                <a
+                                                                        href={`http://localhost:5001/uploads/${applicant.resumeFileName}`}
+                                                                        target="_blank"
+                                                                        rel="noreferrer"
+                                                                >
+                                                                        View resume
+                                                                </a>
+                                                        )}
+                                                </article>
+                                        ))}
+                                </div>
                         )}
+                </section>
+        </div>
+	                                )}
                         </div>
                 </div>
         )

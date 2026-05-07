@@ -26,8 +26,6 @@ function Profile() {
         const [resumeFile, setResumeFile] = useState(null);
         const [applicationCounts, setApplicationCounts] = useState({
                 submitted: 0,
-                draft: 0,
-                responded: 0
         });
 
         useEffect(() => {
@@ -79,8 +77,6 @@ function Profile() {
                     if (data.ok) {
                       setApplicationCounts({
                         submitted: data.data.submitted || 0,
-                        draft: data.data.draft || 0,
-                        responded: data.data.responded || 0
                       });
                     }
                   })
@@ -535,20 +531,11 @@ function Profile() {
                                 <aside className="profile-aside">
                                         <div className="profile-sidebar-card">
                                                 <h3 className="profile-sidebar-title">Applications</h3>
-                                                <p className="profile-sidebar-lead">Your application activity by status.</p>
 
                                                 <dl className="profile-dl">
                                                         <div className="profile-dl-row">
                                                                 <dt>Submitted</dt>
                                                                 <dd>{applicationCounts.submitted}</dd>
-                                                        </div>
-                                                        <div className="profile-dl-row">
-                                                                <dt>Draft</dt>
-                                                                <dd>{applicationCounts.draft}</dd>
-                                                        </div>
-                                                        <div className="profile-dl-row">
-                                                                <dt>Responded</dt>
-                                                                <dd>{applicationCounts.responded}</dd>
                                                         </div>
                                                 </dl>
                                         </div>

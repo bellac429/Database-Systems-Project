@@ -176,3 +176,33 @@
   opacity: 0.55;
   cursor: not-allowed;
 }
+.posted-listing-detail {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+}
+
+.applicants-panel {
+        background: #0c3440;
+        border-radius: 18px;
+        padding: 24px;
+        color: white;
+}
+
+.applicants-list {
+        display: grid;
+        gap: 16px;
+}
+
+.applicant-card {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 16px;
+}
+
+.applicant-card a {
+        display: inline-block;
+        margin-top: 8px;
+        color: white;
+        font-weight: 700;
+}

@@ -546,7 +546,7 @@ app.post("/api/listings", async (req, res) => {
         `
         SELECT c.userID
         FROM Company c
-        INNER JOIN Users u ON u.userID = c.userID
+        INNER JOIN users u ON u.userID = c.userID
         WHERE u.email = ?
         LIMIT 1
         `,
@@ -635,7 +635,7 @@ app.patch("/api/listings/:listingId", async (req, res) => {
         `
         SELECT c.userID
         FROM Company c
-        INNER JOIN Users u ON u.userID = c.userID
+        INNER JOIN users u ON u.userID = c.userID
         WHERE u.email = ?
         LIMIT 1
         `,
@@ -1105,4 +1105,45 @@ app.get("/api/students/:userId/applications/status-counts", async (req, res) => 
       error: err.message
     });
   }
+});
+
+app.get("/api/listings/:listingId/applicants", async (req, res) => {
+  try {
+    const { listingId } = req.params;
+    const { companyUserId } = req.query;
+
+    const [rows] = await pool.query(
+      `
+      SELECT
+        a.applicationID,
+        a.status,
+        a.submitTime,
+        u.email,
+        s.firstName,
+        s.lastName,
+        r.fileName AS resumeFileName
+      FROM Application a
+      JOIN Listing l ON a.listingID = l.listingID
+      JOIN Student s ON a.userID = s.userID
+      JOIN users u ON s.userID = u.userID
+      LEFT JOIN Resume r ON a.resumeID = r.resumeID
+      WHERE a.listingID = ?
+        AND l.userID = ?
+      ORDER BY a.submitTime DESC
+      `,
+      [listingId, companyUserId]
+    );
+
+    res.json({
+      ok: true,
+      data: rows
+    });
+  } catch (err) {
+  console.error("Load applicants error:", err);
+
+  res.status(500).json({
+    ok: false,
+    error: err.message
+  });
+}
 });
